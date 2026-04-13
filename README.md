@@ -12,28 +12,34 @@ The trade-off is coverage. An MCP exposes the entire Linear API; Linearis covers
 
 ## Installation
 
-This is a private fork of [linearis-oss/linearis](https://github.com/linearis-oss/linearis). Install it directly from GitHub:
+This is a private fork of [linearis-oss/linearis](https://github.com/linearis-oss/linearis). Requires Node.js >= 22 and SSH access to the (private) fork repository.
+
+Install with the bundled script, which clones the repo, packs a tarball, and installs it globally:
 
 ```bash
 # If a previous version is installed globally, remove it first
 npm uninstall -g linearis
 
-# Install this fork globally
-npm install -g github:pwen-ventures/linearis
+# One-liner install
+curl -sSL https://raw.githubusercontent.com/pwen-ventures/linearis/main/scripts/install.sh | bash
 
 # Verify
 which linearis && linearis --version
 ```
 
-Pin to a specific branch/tag/commit by appending `#<ref>`:
+Or run the same steps manually:
 
 ```bash
-npm install -g github:pwen-ventures/linearis#main
+TMPD=$(mktemp -d)
+git clone git@github.com:pwen-ventures/linearis.git "$TMPD/linearis"
+cd "$TMPD/linearis"
+npm pack --silent
+npm install -g "$TMPD/linearis/linearis-"*.tgz
 ```
 
-Requires Node.js >= 22 and SSH access to the (private) fork repository.
+> **Why not `npm install -g github:pwen-ventures/linearis`?** npm's git-dependency resolver has a [known issue](https://github.com/npm/cli/issues) where it silently produces empty installs for some repos (it extracts a partial, `node_modules`-only tree from its temp cache and packs an empty tarball from that). Even with generated artifacts committed and a no-op `prepack`, the install drops all source files. The clone+pack approach avoids that code path entirely.
 
-> **Note for this fork:** Unlike the upstream project, this fork commits generated artifacts (`dist/`, `src/gql/`, `USAGE.md`) to git. This keeps `npm install -g github:...` reliable — no codegen or TypeScript build runs during install. The cost is that you must regenerate and rebuild before committing changes. See **Updating after code changes** below.
+> **Note for this fork:** This fork commits generated artifacts (`dist/`, `src/gql/`, `USAGE.md`) to git so that the install script can pack and install without running codegen or `tsc`. See **Updating after code changes** below for the rebuild workflow.
 
 ### Updating after code changes
 
