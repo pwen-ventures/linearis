@@ -1,0 +1,91 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { decryptToken, encryptToken } from "./encryption.js";
+const DIR_NAME = "linearis";
+const LEGACY_DIR_NAME = ".linearis";
+const TOKEN_FILE = "token";
+export function getTokenDir() {
+    if (process.platform === "linux") {
+        const xdgConfig = process.env.XDG_CONFIG_HOME;
+        if (xdgConfig && path.isAbsolute(xdgConfig)) {
+            return path.join(xdgConfig, DIR_NAME);
+        }
+        return path.join(os.homedir(), ".config", DIR_NAME);
+    }
+    return path.join(os.homedir(), LEGACY_DIR_NAME);
+}
+function getLegacyTokenDir() {
+    return path.join(os.homedir(), LEGACY_DIR_NAME);
+}
+function getTokenPath() {
+    return path.join(getTokenDir(), TOKEN_FILE);
+}
+function getLegacyTokenPath() {
+    return path.join(getLegacyTokenDir(), TOKEN_FILE);
+}
+export function ensureTokenDir() {
+    const dir = getTokenDir();
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+    }
+    else {
+        fs.chmodSync(dir, 0o700);
+    }
+}
+export function saveToken(token) {
+    ensureTokenDir();
+    const tokenPath = getTokenPath();
+    const encrypted = encryptToken(token);
+    fs.writeFileSync(tokenPath, encrypted, "utf8");
+    fs.chmodSync(tokenPath, 0o600);
+}
+export function getStoredToken() {
+    const tokenPath = getTokenPath();
+    if (!fs.existsSync(tokenPath)) {
+        if (process.platform === "linux") {
+            const legacy = getLegacyTokenPath();
+            if (fs.existsSync(legacy)) {
+                try {
+                    const encrypted = fs.readFileSync(legacy, "utf8").trim();
+                    return decryptToken(encrypted);
+                }
+                catch (err) {
+                    if (err instanceof Error &&
+                        err.code === "ENOENT") {
+                        return null;
+                    }
+                    console.error("Warning: stored token could not be decrypted and will be ignored. " +
+                        "Run 'linearis auth login' to reauthenticate.");
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+    try {
+        const encrypted = fs.readFileSync(tokenPath, "utf8").trim();
+        return decryptToken(encrypted);
+    }
+    catch (err) {
+        if (err instanceof Error &&
+            err.code === "ENOENT") {
+            return null;
+        }
+        console.error("Warning: stored token could not be decrypted and will be ignored. " +
+            "Run 'linearis auth login' to reauthenticate.");
+        return null;
+    }
+}
+export function clearToken() {
+    const tokenPath = getTokenPath();
+    if (fs.existsSync(tokenPath)) {
+        fs.unlinkSync(tokenPath);
+    }
+    if (process.platform === "linux") {
+        const legacy = getLegacyTokenPath();
+        if (fs.existsSync(legacy)) {
+            fs.unlinkSync(legacy);
+        }
+    }
+}

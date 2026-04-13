@@ -1,6 +1,9 @@
-# Generated files
-/src/gql/
-USAGE.md
+# Generated files (intentionally committed in this private fork so that
+# `npm install -g github:pwen-ventures/linearis` works without running
+# codegen or tsc during the install. Regenerate with `npm run generate`
+# and `npm run build` before committing changes that affect them.)
+# /src/gql/
+# USAGE.md
 
 docs/superpowers/
 
@@ -157,7 +160,7 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
+# dist  # intentionally committed — see top of file
 
 # Gatsby files
 .cache/
@@ -302,6 +305,9 @@ dist
 # Ignore all local history of files
 .history
 .ionide
+
+### JetBrains IDEs ###
+.idea/
 
 ### Windows ###
 # Windows thumbnail cache files

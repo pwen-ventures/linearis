@@ -12,21 +12,92 @@ The trade-off is coverage. An MCP exposes the entire Linear API; Linearis covers
 
 ## Installation
 
+This is a private fork of [linearis-oss/linearis](https://github.com/linearis-oss/linearis). Install it directly from GitHub:
+
 ```bash
-npm install -g linearis
+# If a previous version is installed globally, remove it first
+npm uninstall -g linearis
+
+# Install this fork globally
+npm install -g github:pwen-ventures/linearis
+
+# Verify
+which linearis && linearis --version
 ```
 
-Requires Node.js >= 22.
+Pin to a specific branch/tag/commit by appending `#<ref>`:
+
+```bash
+npm install -g github:pwen-ventures/linearis#main
+```
+
+Requires Node.js >= 22 and SSH access to the (private) fork repository.
+
+> **Note for this fork:** Unlike the upstream project, this fork commits generated artifacts (`dist/`, `src/gql/`, `USAGE.md`) to git. This keeps `npm install -g github:...` reliable — no codegen or TypeScript build runs during install. The cost is that you must regenerate and rebuild before committing changes. See **Updating after code changes** below.
+
+### Updating after code changes
+
+Because the fork ships prebuilt artifacts, changes to `src/` are **not** reflected in the global `linearis` until you rebuild and commit the new `dist/`. The workflow:
+
+```bash
+cd /path/to/linearis
+
+# 1. Pull or make your changes
+git pull                                              # from your fork (origin)
+# or: git fetch upstream && git merge upstream/main   # from linearis-oss
+
+# 2. If dependencies changed (package.json / package-lock.json)
+npm install
+
+# 3. If GraphQL schema/operations changed (graphql/**/*.graphql)
+npm run generate
+
+# 4. Rebuild (this also runs generate and generate:usage via prebuild)
+npm run build
+
+# 5. Commit the regenerated artifacts alongside your source changes
+git add src/gql dist USAGE.md
+git commit -m "chore: rebuild dist"
+git push
+
+# 6. Reinstall globally to pick up the new build
+npm install -g github:pwen-ventures/linearis
+```
+
+**Tip:** If you forget to rebuild before pushing, the installed CLI will run stale code even though the source in git is up to date. Consider adding a pre-push hook or a release checklist.
+
+### First-time dev setup (for contributors to this fork)
+
+After cloning for local development, run:
+
+```bash
+npm install
+npm run dev:setup    # runs codegen + installs lefthook git hooks
+```
+
+(The upstream project used a `prepare` hook for this, but we removed it so that `npm install -g github:...` doesn't try to run dev tools.)
 
 ## Authentication
+
+Linearis authenticates against the Linear GraphQL API using an **OAuth application developer token**. Create one in Linear, then log in:
+
+### 1. Create an OAuth application in Linear
+
+1. Open Linear and go to **Settings → API → OAuth Applications**.
+2. Click **Create new** and fill in the required fields (name, icon, callback URL — any valid URL works if you won't complete an OAuth flow).
+3. After saving, open the application and **copy the developer token**. This token authenticates as the application itself and is all the CLI needs — no full OAuth redirect flow required.
+
+> The developer token shown on the OAuth application page is scoped to your workspace and acts like a long-lived API token for the app. Treat it as a secret.
+
+### 2. Log in to the CLI
 
 ```bash
 linearis auth login
 ```
 
-This opens Linear in your browser, guides you through creating an API key, and stores the token encrypted in `~/.linearis/token`.
+This prompts for the token, encrypts it, and stores it in `~/.linearis/token`.
 
-Alternatively, provide a token directly:
+Alternatively, provide the token directly:
 
 ```bash
 # Via CLI flag
@@ -40,12 +111,12 @@ Token resolution order: `--api-token` flag > `LINEAR_API_TOKEN` env > `~/.linear
 
 ### OAuth Actor Authorization (optional)
 
-When using an OAuth token authorized with `actor=app`, you can attribute created issues/comments to a named user with a custom avatar (rendered as _User (via Application)_ in Linear) by setting:
+If the OAuth application was authorized with `actor=app`, created issues/comments are attributed to the application itself rather than a user. You can attach a display name and avatar (rendered as _Name (via Application)_ in Linear) by setting:
 
 - `LINEAR_CREATE_AS_USER` — display name for the acting user
 - `LINEAR_DISPLAY_ICON_URL` — URL of the avatar image
 
-These are applied automatically to `issues create`, `comments create`, and `comments reply`. They have no effect with a personal API token. Explicit input values in the mutation override the env defaults.
+These are applied automatically to `issues create`, `comments create`, and `comments reply`. They have no effect when authenticating with a personal API token. Explicit input values in the mutation override the env defaults.
 
 ## Usage
 

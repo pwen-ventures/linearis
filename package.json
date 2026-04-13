@@ -34,8 +34,7 @@
     "prestart": "npm run generate",
     "predev": "npm run generate",
     "prebuild": "npm run generate && npm run generate:usage",
-    "prepare": "npm run generate && lefthook install",
-    "prepack": "npm run build",
+    "dev:setup": "npm run generate && lefthook install",
     "prepublishOnly": "npm test"
   },
   "engines": {
