@@ -38,6 +38,15 @@ LINEAR_API_TOKEN=<token> linearis issues list
 
 Token resolution order: `--api-token` flag > `LINEAR_API_TOKEN` env > `~/.linearis/token` > `~/.linear_api_token` (deprecated).
 
+### OAuth Actor Authorization (optional)
+
+When using an OAuth token authorized with `actor=app`, you can attribute created issues/comments to a named user with a custom avatar (rendered as _User (via Application)_ in Linear) by setting:
+
+- `LINEAR_CREATE_AS_USER` — display name for the acting user
+- `LINEAR_DISPLAY_ICON_URL` — URL of the avatar image
+
+These are applied automatically to `issues create`, `comments create`, and `comments reply`. They have no effect with a personal API token. Explicit input values in the mutation override the env defaults.
+
 ## Usage
 
 All output is JSON. Pipe through `jq` or similar for formatting.
