@@ -1,6 +1,7 @@
 import { AUTH_ERROR_CODE, AuthenticationError, invalidParameterError, } from "./errors.js";
 export function outputSuccess(data) {
     console.log(JSON.stringify(data, null, 2));
+    process.exit(0);
 }
 export function outputError(error) {
     console.error(JSON.stringify({ error: error.message }, null, 2));

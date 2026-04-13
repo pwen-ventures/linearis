@@ -6,6 +6,7 @@ import {
 
 export function outputSuccess(data: unknown): void {
   console.log(JSON.stringify(data, null, 2));
+  process.exit(0);
 }
 
 export function outputError(error: Error): void {

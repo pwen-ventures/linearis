@@ -10,13 +10,21 @@ import {
 } from "../../../src/common/output.js";
 
 describe("outputSuccess", () => {
-  it("writes JSON to stdout", () => {
+  it("writes JSON to stdout and exits with code 0", () => {
     const spy = vi.spyOn(console, "log").mockImplementation(() => {});
+    const exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation(() => undefined as never);
+
     outputSuccess({ id: "123", title: "Test" });
+
     expect(spy).toHaveBeenCalledWith(
       JSON.stringify({ id: "123", title: "Test" }, null, 2),
     );
+    expect(exitSpy).toHaveBeenCalledWith(0);
+
     spy.mockRestore();
+    exitSpy.mockRestore();
   });
 });
 
