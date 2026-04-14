@@ -21,6 +21,14 @@ fragment CommentFields on Comment {
     id
     displayName
   }
+  botActor {
+    id
+    name
+    type
+    subType
+    avatarUrl
+    userDisplayName
+  }
 }
 
 # Create a comment on an issue
