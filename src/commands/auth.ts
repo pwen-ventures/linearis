@@ -1,5 +1,9 @@
 import { exec } from "node:child_process";
 import { createInterface } from "node:readline";
+import { promisify } from "node:util";
+
+const execAsync = promisify(exec);
+
 import type { Command } from "commander";
 import {
   type CommandOptions,
@@ -8,6 +12,14 @@ import {
 } from "../common/auth.js";
 import { createGraphQLClient } from "../common/context.js";
 import { handleCommand, outputSuccess } from "../common/output.js";
+import {
+  deleteProfile,
+  ensureProfilesFile,
+  getProfilesPath,
+  listProfiles,
+  profileExists,
+  saveProfile,
+} from "../common/profile-storage.js";
 import { clearToken, saveToken } from "../common/token-storage.js";
 import type { Viewer } from "../common/types.js";
 import { type DomainMeta, formatDomainUsage } from "../common/usage.js";
@@ -18,7 +30,10 @@ const LINEAR_API_KEY_URL =
 
 const SOURCE_LABELS: Record<TokenSource, string> = {
   flag: "--api-token flag",
+  "profile-flag": "--profile flag",
+  "profile-env": "LINEARIS_PROFILE env var",
   env: "LINEAR_API_TOKEN env var",
+  "profile-default": "default profile",
   stored: "~/.linearis/token",
   legacy: "~/.linear_api_token (deprecated)",
 };
@@ -28,14 +43,22 @@ export const AUTH_META: DomainMeta = {
   summary: "authenticate with Linear API (interactive, for humans)",
   context: [
     "linearis requires a Linear API token for all operations.",
-    "the auth command guides you through creating and storing a token.",
-    "tokens are encrypted and stored in ~/.linearis/token.",
-    "token resolution order: --api-token flag, LINEAR_API_TOKEN env,",
-    "~/.linearis/token (encrypted), ~/.linear_api_token (deprecated).",
+    "use 'auth login' to store a token (optionally under a named profile via -p).",
+    "profiles let you switch between tokens and actor attributions (createAsUser,",
+    "displayIconUrl) and live in ~/.linearis/profiles.json (encrypted token).",
+    "token resolution order: --api-token flag, --profile flag, LINEARIS_PROFILE",
+    "env, LINEAR_API_TOKEN env, default profile, ~/.linearis/token (legacy),",
+    "~/.linear_api_token (deprecated).",
   ].join("\n"),
   arguments: {},
   seeAlso: [],
 };
+
+interface LoginOptions {
+  force?: boolean;
+  as?: string;
+  iconUrl?: string;
+}
 
 function openBrowser(url: string): void {
   const cmd =
@@ -108,6 +131,10 @@ function validateApiToken(token: string): Promise<Viewer> {
   return validateToken(createGraphQLClient(token));
 }
 
+function getRootOpts(command: Command): CommandOptions {
+  return command.parent!.parent!.opts() as CommandOptions;
+}
+
 export function setupAuthCommands(program: Command): void {
   const auth = program
     .command("auth")
@@ -120,11 +147,21 @@ export function setupAuthCommands(program: Command): void {
     .command("login")
     .description("set up or refresh authentication")
     .option("--force", "reauthenticate even if already authenticated")
-    .action(async (options: { force?: boolean }, command: Command) => {
+    .option(
+      "--as <name>",
+      "display name for created issues/comments (profile only)",
+    )
+    .option(
+      "--icon-url <url>",
+      "avatar URL for created issues/comments (profile only)",
+    )
+    .action(async (options: LoginOptions, command: Command) => {
+      const rootOpts = getRootOpts(command);
+      const profileName = rootOpts.profile;
+
       try {
-        if (!options.force) {
+        if (!options.force && !profileName) {
           try {
-            const rootOpts = command.parent!.parent!.opts() as CommandOptions;
             const { token, source } = resolveApiToken(rootOpts);
             try {
               const viewer = await validateApiToken(token);
@@ -144,7 +181,18 @@ export function setupAuthCommands(program: Command): void {
           }
         }
 
+        if (profileName && !options.force && profileExists(profileName)) {
+          console.error(
+            `Profile "${profileName}" already exists. Run with --force to overwrite.`,
+          );
+          return;
+        }
+
         console.error("");
+        if (profileName) {
+          console.error(`Setting up profile: ${profileName}`);
+          console.error("");
+        }
         console.error("To authenticate, create a new Linear API key:");
         console.error("");
         console.error(
@@ -180,13 +228,30 @@ export function setupAuthCommands(program: Command): void {
           return;
         }
 
-        saveToken(token);
-
-        console.error("");
-        console.error(
-          `Authentication successful. Logged in as ${viewer.name} (${viewer.email}).`,
-        );
-        console.error("Token encrypted and stored in ~/.linearis/token");
+        if (profileName) {
+          saveProfile(profileName, {
+            token,
+            createAsUser: options.as,
+            displayIconUrl: options.iconUrl,
+          });
+          console.error("");
+          console.error(
+            `Profile "${profileName}" saved. Logged in as ${viewer.name} (${viewer.email}).`,
+          );
+          console.error(`Stored in ${getProfilesPath()}`);
+        } else {
+          if (options.as || options.iconUrl) {
+            console.error(
+              "Warning: --as and --icon-url require -p/--profile; ignoring.",
+            );
+          }
+          saveToken(token);
+          console.error("");
+          console.error(
+            `Authentication successful. Logged in as ${viewer.name} (${viewer.email}).`,
+          );
+          console.error("Token encrypted and stored in ~/.linearis/token");
+        }
       } catch (error) {
         console.error(
           `Authentication failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -197,55 +262,26 @@ export function setupAuthCommands(program: Command): void {
     });
 
   auth
-    .command("status")
-    .description("check current authentication status")
+    .command("logout")
+    .description("remove stored authentication token or profile")
     .action(
       handleCommand(async (...args: unknown[]) => {
-        const [, command] = args as [CommandOptions, Command];
-        const rootOpts = command.parent!.parent!.opts() as CommandOptions;
+        const [, command] = args as [unknown, Command];
+        const rootOpts = getRootOpts(command);
 
-        let token: string;
-        let source: TokenSource;
-        try {
-          const resolved = resolveApiToken(rootOpts);
-          token = resolved.token;
-          source = resolved.source;
-        } catch {
-          // resolveApiToken throws when no token found — report unauthenticated
+        if (rootOpts.profile) {
+          const removed = deleteProfile(rootOpts.profile);
+          if (!removed) {
+            outputSuccess({
+              message: `Profile "${rootOpts.profile}" does not exist.`,
+            });
+            return;
+          }
           outputSuccess({
-            authenticated: false,
-            message:
-              "No API token found. Run 'linearis auth login' to authenticate.",
+            message: `Profile "${rootOpts.profile}" removed.`,
           });
           return;
         }
-
-        try {
-          const viewer = await validateApiToken(token);
-          outputSuccess({
-            authenticated: true,
-            source: SOURCE_LABELS[source],
-            user: { id: viewer.id, name: viewer.name, email: viewer.email },
-          });
-        } catch {
-          // Token is invalid or expired — report unauthenticated with source
-          outputSuccess({
-            authenticated: false,
-            source: SOURCE_LABELS[source],
-            message:
-              "Token is invalid or expired. Run 'linearis auth login' to reauthenticate.",
-          });
-        }
-      }),
-    );
-
-  auth
-    .command("logout")
-    .description("remove stored authentication token")
-    .action(
-      handleCommand(async (...args: unknown[]) => {
-        const [, command] = args as [CommandOptions, Command];
-        const rootOpts = command.parent!.parent!.opts() as CommandOptions;
 
         clearToken();
 
@@ -257,9 +293,41 @@ export function setupAuthCommands(program: Command): void {
             warning: `A token is still active via ${SOURCE_LABELS[source]}.`,
           });
         } catch {
-          // No token remaining after logout — nothing to warn about
           outputSuccess({ message: "Authentication token removed." });
         }
+      }),
+    );
+
+  auth
+    .command("list")
+    .description("list configured profiles")
+    .action(
+      handleCommand(async () => {
+        const { defaultProfile, profiles } = listProfiles();
+        outputSuccess({
+          defaultProfile,
+          profiles,
+          path: getProfilesPath(),
+        });
+      }),
+    );
+
+  auth
+    .command("config")
+    .description("open the profile config file in VS Code")
+    .action(
+      handleCommand(async () => {
+        ensureProfilesFile();
+        const filePath = getProfilesPath();
+        try {
+          await execAsync(`code ${JSON.stringify(filePath)}`);
+        } catch (error) {
+          const detail = error instanceof Error ? error.message : String(error);
+          throw new Error(
+            `Failed to open VS Code (path: ${filePath}): ${detail}`,
+          );
+        }
+        outputSuccess({ path: filePath, opened: true });
       }),
     );
 

@@ -76,8 +76,8 @@ export async function searchIssues(client, term, options = {}, filter) {
         pageInfo: result.searchIssues.pageInfo,
     };
 }
-export async function createIssue(client, input) {
-    const result = await client.request(CreateIssueDocument, { input: applyActorOverrides(input) });
+export async function createIssue(client, input, actorOverrides) {
+    const result = await client.request(CreateIssueDocument, { input: applyActorOverrides(input, actorOverrides) });
     if (!result.issueCreate.success || !result.issueCreate.issue) {
         throw new Error("Failed to create issue");
     }

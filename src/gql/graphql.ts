@@ -718,6 +718,7 @@ export enum AiConversationEntityCardWidgetArgsType {
   CustomView = 'CustomView',
   Customer = 'Customer',
   CustomerNeed = 'CustomerNeed',
+  Dashboard = 'Dashboard',
   Document = 'Document',
   Initiative = 'Initiative',
   InitiativeUpdate = 'InitiativeUpdate',
@@ -778,6 +779,7 @@ export enum AiConversationEntityListWidgetArgsEntitiesType {
   CustomView = 'CustomView',
   Customer = 'Customer',
   CustomerNeed = 'CustomerNeed',
+  Dashboard = 'Dashboard',
   Document = 'Document',
   Initiative = 'Initiative',
   InitiativeUpdate = 'InitiativeUpdate',
@@ -6955,6 +6957,7 @@ export enum IntegrationService {
   McpServerPersonal = 'mcpServerPersonal',
   MicrosoftPersonal = 'microsoftPersonal',
   MicrosoftTeams = 'microsoftTeams',
+  MicrosoftTeamsProjectPost = 'microsoftTeamsProjectPost',
   Notion = 'notion',
   Opsgenie = 'opsgenie',
   PagerDuty = 'pagerDuty',
@@ -6986,6 +6989,7 @@ export type IntegrationSettingsInput = {
   jiraPersonal?: InputMaybe<JiraPersonalSettingsInput>;
   launchDarkly?: InputMaybe<LaunchDarklySettingsInput>;
   microsoftTeams?: InputMaybe<MicrosoftTeamsSettingsInput>;
+  microsoftTeamsProjectPost?: InputMaybe<MicrosoftTeamsPostSettingsInput>;
   notion?: InputMaybe<NotionSettingsInput>;
   opsgenie?: InputMaybe<OpsgenieInput>;
   pagerDuty?: InputMaybe<PagerDutyInput>;
@@ -7087,6 +7091,8 @@ export type IntegrationsSettings = Node & {
   id: Scalars['ID']['output'];
   /** Initiative which those settings apply to. */
   initiative?: Maybe<Initiative>;
+  /** Whether to send a Microsoft Teams message when a project update is created. */
+  microsoftTeamsProjectUpdateCreated?: Maybe<Scalars['Boolean']['output']>;
   /** Project which those settings apply to. */
   project?: Maybe<Project>;
   /** Whether to send a Slack message when an initiative update is created. */
@@ -7134,6 +7140,8 @@ export type IntegrationsSettingsCreateInput = {
   id?: InputMaybe<Scalars['String']['input']>;
   /** The identifier of the initiative to create settings for. */
   initiativeId?: InputMaybe<Scalars['String']['input']>;
+  /** Whether to send a Microsoft Teams message when a project update is created. */
+  microsoftTeamsProjectUpdateCreated?: InputMaybe<Scalars['Boolean']['input']>;
   /** The identifier of the project to create settings for. */
   projectId?: InputMaybe<Scalars['String']['input']>;
   /** Whether to send a Slack message when an initiative update is created. */
@@ -7175,6 +7183,8 @@ export type IntegrationsSettingsPayload = {
 };
 
 export type IntegrationsSettingsUpdateInput = {
+  /** Whether to send a Microsoft Teams message when a project update is created. */
+  microsoftTeamsProjectUpdateCreated?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether to send a Slack message when an initiative update is created. */
   slackInitiativeUpdateCreated?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether to send a Slack message when a new issue is added to triage. */
@@ -9788,11 +9798,62 @@ export type ManualSort = {
   order?: InputMaybe<PaginationSortOrder>;
 };
 
+/** An additional HTTP header sent with requests to the connected MCP server. Header values are stored securely. */
+export type McpServerCustomHeaderInput = {
+  /** The HTTP header name. */
+  name: Scalars['String']['input'];
+  /** The HTTP header value. */
+  value: Scalars['String']['input'];
+};
+
+export type MicrosoftTeamsChannel = {
+  __typename?: 'MicrosoftTeamsChannel';
+  /** The display name of the channel. */
+  displayName: Scalars['String']['output'];
+  /** The Microsoft Teams channel id (e.g. `19:abc@thread.tacv2`). */
+  id: Scalars['String']['output'];
+  /** The membership type of the channel: standard, private, or shared. */
+  membershipType: Scalars['String']['output'];
+};
+
+export type MicrosoftTeamsChannelsPayload = {
+  __typename?: 'MicrosoftTeamsChannelsPayload';
+  /** Whether the operation was successful. */
+  success: Scalars['Boolean']['output'];
+  /** The teams the user belongs to with their channels. */
+  teams: Array<MicrosoftTeamsTeam>;
+};
+
+export type MicrosoftTeamsPostSettingsInput = {
+  /** Microsoft Teams channel id. */
+  channelId: Scalars['String']['input'];
+  /** Display name of the channel. */
+  channelName: Scalars['String']['input'];
+  /** Membership type of the channel: standard, private, or shared. */
+  membershipType: Scalars['String']['input'];
+  /** AAD group id of the Team. */
+  teamId: Scalars['String']['input'];
+  /** Display name of the Team. */
+  teamName: Scalars['String']['input'];
+  /** Azure AD tenant id the team belongs to. */
+  tenantId: Scalars['String']['input'];
+};
+
 export type MicrosoftTeamsSettingsInput = {
   /** Whether Code Intelligence should be enabled for this Microsoft Teams integration. */
   enableCodeIntelligence?: InputMaybe<Scalars['Boolean']['input']>;
   /** The display name of the Azure AD tenant. */
   tenantName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type MicrosoftTeamsTeam = {
+  __typename?: 'MicrosoftTeamsTeam';
+  /** The channels in the team the user can access. */
+  channels: Array<MicrosoftTeamsChannel>;
+  /** The display name of the team. */
+  displayName: Scalars['String']['output'];
+  /** The AAD group id of the team. */
+  id: Scalars['String']['output'];
 };
 
 /** Issue project milestone options. */
@@ -10083,6 +10144,8 @@ export type Mutation = {
   integrationMicrosoftPersonalConnect: IntegrationPayload;
   /** Integrates the workspace with Microsoft Teams. */
   integrationMicrosoftTeams: IntegrationPayload;
+  /** [Internal] Connect a project to a Microsoft Teams channel. Find-or-update semantics: creates a microsoftTeamsProjectPost integration row if none exists for the project, or overwrites the existing one's team/channel selection. Requires the connecting user to have linked their personal Microsoft account. */
+  integrationMicrosoftTeamsProjectPost: IntegrationPayload;
   /** [INTERNAL] Integrates the workspace with Opsgenie. */
   integrationOpsgenieConnect: IntegrationPayload;
   /** [INTERNAL] Refresh Opsgenie schedule mappings. */
@@ -11297,6 +11360,7 @@ export type MutationIntegrationLaunchDarklyPersonalConnectArgs = {
 
 
 export type MutationIntegrationMcpServerConnectArgs = {
+  customHeaders?: InputMaybe<Array<McpServerCustomHeaderInput>>;
   serverUrl: Scalars['String']['input'];
   teamId?: InputMaybe<Scalars['String']['input']>;
   workflowDefinitionId?: InputMaybe<Scalars['String']['input']>;
@@ -11304,6 +11368,7 @@ export type MutationIntegrationMcpServerConnectArgs = {
 
 
 export type MutationIntegrationMcpServerPersonalConnectArgs = {
+  customHeaders?: InputMaybe<Array<McpServerCustomHeaderInput>>;
   serverUrl: Scalars['String']['input'];
 };
 
@@ -11317,6 +11382,16 @@ export type MutationIntegrationMicrosoftPersonalConnectArgs = {
 export type MutationIntegrationMicrosoftTeamsArgs = {
   code: Scalars['String']['input'];
   redirectUri: Scalars['String']['input'];
+};
+
+
+export type MutationIntegrationMicrosoftTeamsProjectPostArgs = {
+  channelId: Scalars['String']['input'];
+  channelName: Scalars['String']['input'];
+  membershipType: Scalars['String']['input'];
+  projectId: Scalars['String']['input'];
+  teamId: Scalars['String']['input'];
+  teamName: Scalars['String']['input'];
 };
 
 
@@ -17325,6 +17400,8 @@ export type Query = {
   issues: IssueConnection;
   /** [ALPHA] Returns the latest release for the pipeline associated with the access key. */
   latestReleaseByAccessKey?: Maybe<Release>;
+  /** [Internal] Lists Microsoft Teams teams and channels accessible to the connecting user. Uses the user's microsoftPersonal integration for auth. Used by the project channel picker dialog to populate the team/channel dropdowns. */
+  microsoftTeamsChannels: MicrosoftTeamsChannelsPayload;
   /** A specific notification by ID. */
   notification: Notification;
   /** A specific notification subscription by ID. */

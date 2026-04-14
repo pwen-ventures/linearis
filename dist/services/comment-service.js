@@ -1,7 +1,7 @@
 import { applyActorOverrides } from "../common/actor.js";
 import { CreateCommentDocument, DeleteCommentDocument, ListCommentsDocument, UpdateCommentDocument, } from "../gql/graphql.js";
-export async function createComment(client, input) {
-    const result = await client.request(CreateCommentDocument, { input: applyActorOverrides(input) });
+export async function createComment(client, input, actorOverrides) {
+    const result = await client.request(CreateCommentDocument, { input: applyActorOverrides(input, actorOverrides) });
     if (!result.commentCreate.success || !result.commentCreate.comment) {
         throw new Error("Failed to create comment");
     }
@@ -32,12 +32,12 @@ export async function listComments(client, issueId, options = {}) {
         },
     };
 }
-export async function replyToComment(client, input) {
+export async function replyToComment(client, input, actorOverrides) {
     const result = await client.request(CreateCommentDocument, {
         input: applyActorOverrides({
             parentId: input.parentId,
             body: input.body,
-        }),
+        }, actorOverrides),
     });
     if (!result.commentCreate.success || !result.commentCreate.comment) {
         throw new Error("Failed to create reply");

@@ -1,5 +1,5 @@
 import type { GraphQLClient } from "../client/graphql-client.js";
-import { applyActorOverrides } from "../common/actor.js";
+import { type ActorOverrides, applyActorOverrides } from "../common/actor.js";
 import type {
   CreatedIssue,
   Issue,
@@ -169,10 +169,11 @@ export async function searchIssues(
 export async function createIssue(
   client: GraphQLClient,
   input: IssueCreateInput,
+  actorOverrides: ActorOverrides,
 ): Promise<CreatedIssue> {
   const result = await client.request<CreateIssueMutation>(
     CreateIssueDocument,
-    { input: applyActorOverrides(input) },
+    { input: applyActorOverrides(input, actorOverrides) },
   );
   if (!result.issueCreate.success || !result.issueCreate.issue) {
     throw new Error("Failed to create issue");

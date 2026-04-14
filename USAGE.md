@@ -24,18 +24,23 @@ detail: linearis <domain> usage
 linearis auth — authenticate with Linear API (interactive, for humans)
 
 linearis requires a Linear API token for all operations.
-the auth command guides you through creating and storing a token.
-tokens are encrypted and stored in ~/.linearis/token.
-token resolution order: --api-token flag, LINEAR_API_TOKEN env,
-~/.linearis/token (encrypted), ~/.linear_api_token (deprecated).
+use 'auth login' to store a token (optionally under a named profile via -p).
+profiles let you switch between tokens and actor attributions (createAsUser,
+displayIconUrl) and live in ~/.linearis/profiles.json (encrypted token).
+token resolution order: --api-token flag, --profile flag, LINEARIS_PROFILE
+env, LINEAR_API_TOKEN env, default profile, ~/.linearis/token (legacy),
+~/.linear_api_token (deprecated).
 
 commands:
   login [options]  set up or refresh authentication
-  status           check current authentication status
-  logout           remove stored authentication token
+  logout           remove stored authentication token or profile
+  list             list configured profiles
+  config           open the profile config file in VS Code
 
 login options:
-  --force  reauthenticate even if already authenticated
+  --force           reauthenticate even if already authenticated
+  --as <name>       display name for created issues/comments (profile only)
+  --icon-url <url>  avatar URL for created issues/comments (profile only)
 
 ---
 

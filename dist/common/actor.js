@@ -10,8 +10,7 @@ export function getActorOverridesFromEnv(env = process.env) {
     }
     return overrides;
 }
-export function applyActorOverrides(input) {
-    const overrides = getActorOverridesFromEnv();
+export function applyActorOverrides(input, overrides) {
     return {
         ...overrides,
         ...input,

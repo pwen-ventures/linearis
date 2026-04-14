@@ -10,6 +10,12 @@ vi.mock("../../../src/common/token-storage.js", () => ({
   getStoredToken: vi.fn(),
 }));
 
+// Mock profile-storage module (profile resolution is covered by its own tests)
+vi.mock("../../../src/common/profile-storage.js", () => ({
+  getProfile: vi.fn(() => null),
+  getDefaultProfile: vi.fn(() => null),
+}));
+
 import { getApiToken } from "../../../src/common/auth.js";
 import { getStoredToken } from "../../../src/common/token-storage.js";
 

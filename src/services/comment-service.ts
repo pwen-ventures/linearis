@@ -1,5 +1,5 @@
 import type { GraphQLClient } from "../client/graphql-client.js";
-import { applyActorOverrides } from "../common/actor.js";
+import { type ActorOverrides, applyActorOverrides } from "../common/actor.js";
 import type {
   CommentListItem,
   CreatedComment,
@@ -23,10 +23,11 @@ import {
 export async function createComment(
   client: GraphQLClient,
   input: CommentCreateInput,
+  actorOverrides: ActorOverrides,
 ): Promise<CreatedComment> {
   const result = await client.request<CreateCommentMutation>(
     CreateCommentDocument,
-    { input: applyActorOverrides(input) },
+    { input: applyActorOverrides(input, actorOverrides) },
   );
 
   if (!result.commentCreate.success || !result.commentCreate.comment) {
@@ -82,14 +83,18 @@ export async function listComments(
 export async function replyToComment(
   client: GraphQLClient,
   input: { parentId: string; body: string },
+  actorOverrides: ActorOverrides,
 ): Promise<CreatedComment> {
   const result = await client.request<CreateCommentMutation>(
     CreateCommentDocument,
     {
-      input: applyActorOverrides({
-        parentId: input.parentId,
-        body: input.body,
-      }),
+      input: applyActorOverrides(
+        {
+          parentId: input.parentId,
+          body: input.body,
+        },
+        actorOverrides,
+      ),
     },
   );
 

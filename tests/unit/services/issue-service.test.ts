@@ -182,11 +182,15 @@ describe("createIssue", () => {
         issue: { id: "new-id", identifier: "ENG-1", title: "New", estimate: 5 },
       },
     });
-    const result = await createIssue(client, {
-      title: "New",
-      teamId: "team-uuid",
-      estimate: 5,
-    });
+    const result = await createIssue(
+      client,
+      {
+        title: "New",
+        teamId: "team-uuid",
+        estimate: 5,
+      },
+      {},
+    );
     expect(result.id).toBe("new-id");
     expect(client.request).toHaveBeenCalledWith(expect.anything(), {
       input: { title: "New", teamId: "team-uuid", estimate: 5 },
@@ -198,7 +202,7 @@ describe("createIssue", () => {
       issueCreate: { success: false, issue: null },
     });
     await expect(
-      createIssue(client, { title: "Fail", teamId: "team-uuid" }),
+      createIssue(client, { title: "Fail", teamId: "team-uuid" }, {}),
     ).rejects.toThrow("Failed to create issue");
   });
 });

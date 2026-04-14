@@ -32,10 +32,14 @@ describe("createComment", () => {
       },
     });
 
-    const result = await createComment(client, {
-      issueId: "issue-1",
-      body: "This is a comment",
-    });
+    const result = await createComment(
+      client,
+      {
+        issueId: "issue-1",
+        body: "This is a comment",
+      },
+      {},
+    );
 
     expect(result).toEqual({
       id: "comment-1",
@@ -59,7 +63,7 @@ describe("createComment", () => {
     });
 
     await expect(
-      createComment(client, { issueId: "issue-1", body: "test" }),
+      createComment(client, { issueId: "issue-1", body: "test" }, {}),
     ).rejects.toThrow("Failed to create comment");
   });
 
@@ -72,7 +76,7 @@ describe("createComment", () => {
     });
 
     await expect(
-      createComment(client, { issueId: "issue-1", body: "test" }),
+      createComment(client, { issueId: "issue-1", body: "test" }, {}),
     ).rejects.toThrow("Failed to create comment");
   });
 });
@@ -191,10 +195,14 @@ describe("replyToComment", () => {
       },
     });
 
-    const result = await replyToComment(client, {
-      parentId: "comment-1",
-      body: "This is a reply",
-    });
+    const result = await replyToComment(
+      client,
+      {
+        parentId: "comment-1",
+        body: "This is a reply",
+      },
+      {},
+    );
 
     expect(result).toEqual({
       id: "reply-1",
@@ -218,7 +226,7 @@ describe("replyToComment", () => {
     });
 
     await expect(
-      replyToComment(client, { parentId: "comment-1", body: "reply" }),
+      replyToComment(client, { parentId: "comment-1", body: "reply" }, {}),
     ).rejects.toThrow("Failed to create reply");
   });
 });

@@ -98,10 +98,14 @@ export function setupCommentsCommands(program: Command): void {
         }
 
         const resolvedIssueId = await resolveIssueId(ctx.sdk, issue);
-        const result = await createComment(ctx.gql, {
-          issueId: resolvedIssueId,
-          body: options.body,
-        });
+        const result = await createComment(
+          ctx.gql,
+          {
+            issueId: resolvedIssueId,
+            body: options.body,
+          },
+          ctx.actorOverrides,
+        );
 
         outputSuccess(result);
       }),
@@ -124,10 +128,14 @@ export function setupCommentsCommands(program: Command): void {
           throw new Error("--body is required");
         }
 
-        const result = await replyToComment(ctx.gql, {
-          parentId: comment,
-          body: options.body,
-        });
+        const result = await replyToComment(
+          ctx.gql,
+          {
+            parentId: comment,
+            body: options.body,
+          },
+          ctx.actorOverrides,
+        );
 
         outputSuccess(result);
       }),

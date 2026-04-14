@@ -33,7 +33,11 @@ program
   .name("linearis")
   .description("CLI for Linear.app with JSON output")
   .version(pkg.version)
-  .option("--api-token <token>", "Linear API token");
+  .option("--api-token <token>", "Linear API token")
+  .option(
+    "-p, --profile <name>",
+    "named profile from ~/.linearis/profiles.json (LINEARIS_PROFILE env also supported)",
+  );
 
 const allMetas: DomainMeta[] = [
   AUTH_META,

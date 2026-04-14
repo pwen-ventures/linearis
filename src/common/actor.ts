@@ -18,8 +18,10 @@ export function getActorOverridesFromEnv(
   return overrides;
 }
 
-export function applyActorOverrides<T extends object>(input: T): T {
-  const overrides = getActorOverridesFromEnv();
+export function applyActorOverrides<T extends object>(
+  input: T,
+  overrides: ActorOverrides,
+): T {
   return {
     ...overrides,
     ...input,

@@ -502,7 +502,7 @@ export function setupIssuesCommands(program: Command): void {
           input.dueDate = parseDueDate(options.dueDate);
         }
 
-        const result = await createIssue(ctx.gql, input);
+        const result = await createIssue(ctx.gql, input, ctx.actorOverrides);
 
         if (relationActions.length > 0) {
           await resolveAndApplyRelations(ctx, result.id, relationActions);

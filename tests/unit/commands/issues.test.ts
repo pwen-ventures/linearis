@@ -7,6 +7,7 @@ vi.mock("../../../src/common/context.js", () => ({
   createContext: vi.fn(() => ({
     gql: { request: vi.fn() },
     sdk: { sdk: {} },
+    actorOverrides: {},
   })),
 }));
 
@@ -120,6 +121,7 @@ describe("issues create --assignee", () => {
     expect(createIssue).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ assigneeId: "resolved-user-uuid" }),
+      expect.anything(),
     );
   });
 
@@ -144,6 +146,7 @@ describe("issues create --assignee", () => {
     expect(createIssue).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ assigneeId: "resolved-user-uuid" }),
+      expect.anything(),
     );
   });
 
@@ -163,6 +166,7 @@ describe("issues create --assignee", () => {
     expect(createIssue).toHaveBeenCalledWith(
       expect.anything(),
       expect.not.objectContaining({ assigneeId: expect.anything() }),
+      expect.anything(),
     );
   });
 });
@@ -192,6 +196,7 @@ describe("issues create --estimate", () => {
     expect(createIssue).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ estimate: 5 }),
+      expect.anything(),
     );
   });
 
@@ -212,6 +217,7 @@ describe("issues create --estimate", () => {
     expect(createIssue).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ estimate: 0 }),
+      expect.anything(),
     );
   });
 
@@ -230,6 +236,7 @@ describe("issues create --estimate", () => {
     expect(createIssue).toHaveBeenCalledWith(
       expect.anything(),
       expect.not.objectContaining({ estimate: expect.anything() }),
+      expect.anything(),
     );
   });
 });
@@ -259,6 +266,7 @@ describe("issues create --due-date", () => {
     expect(createIssue).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ dueDate: "2025-01-15" }),
+      expect.anything(),
     );
   });
 
@@ -277,6 +285,7 @@ describe("issues create --due-date", () => {
     expect(createIssue).toHaveBeenCalledWith(
       expect.anything(),
       expect.not.objectContaining({ dueDate: expect.anything() }),
+      expect.anything(),
     );
   });
 

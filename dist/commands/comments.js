@@ -50,7 +50,7 @@ export function setupCommentsCommands(program) {
         const result = await createComment(ctx.gql, {
             issueId: resolvedIssueId,
             body: options.body,
-        });
+        }, ctx.actorOverrides);
         outputSuccess(result);
     }));
     comments
@@ -66,7 +66,7 @@ export function setupCommentsCommands(program) {
         const result = await replyToComment(ctx.gql, {
             parentId: comment,
             body: options.body,
-        });
+        }, ctx.actorOverrides);
         outputSuccess(result);
     }));
     comments
