@@ -99,8 +99,7 @@ fragment CompleteIssueWithCommentsFields on Issue {
   ...CompleteIssueFields
   comments {
     nodes {
-      id
-      body
+      ...CommentFields
     }
   }
 }
