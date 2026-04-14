@@ -9,7 +9,7 @@ import { deleteProfile, ensureProfilesFile, getProfilesPath, listProfiles, profi
 import { clearToken, saveToken } from "../common/token-storage.js";
 import { formatDomainUsage } from "../common/usage.js";
 import { validateToken } from "../services/auth-service.js";
-const LINEAR_API_KEY_URL = "https://linear.app/settings/account/security/api-keys/new";
+const LINEAR_API_KEY_URL = "https://linear.app/pwen-ventures/settings/api";
 const SOURCE_LABELS = {
     flag: "--api-token flag",
     "profile-flag": "--profile flag",
@@ -139,14 +139,13 @@ export function setupAuthCommands(program) {
                 console.error(`Setting up profile: ${profileName}`);
                 console.error("");
             }
-            console.error("To authenticate, create a new Linear API key:");
+            console.error("To authenticate, create an OAuth application (recommended) or a personal API key:");
             console.error("");
             console.error("  1. Open the link below (or it will open automatically)");
-            console.error("  2. Set key name to: linearis-cli");
-            console.error("  3. Keep 'Full access' selected (default)");
-            console.error("  4. Keep 'All teams' selected (default)");
-            console.error("  5. Click 'Create'");
-            console.error("  6. Copy the generated token");
+            console.error("  2. For OAuth app: under 'OAuth Applications' create a new app and");
+            console.error("     copy its developer token");
+            console.error("  3. For personal API key: under 'Personal API keys' create a new key");
+            console.error("     and copy the generated token");
             console.error("");
             console.error(`  ${LINEAR_API_KEY_URL}`);
             console.error("");
