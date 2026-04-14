@@ -82,7 +82,7 @@ export async function listComments(
 
 export async function replyToComment(
   client: GraphQLClient,
-  input: { parentId: string; body: string },
+  input: { issueId: string; parentId: string; body: string },
   actorOverrides: ActorOverrides,
 ): Promise<CreatedComment> {
   const result = await client.request<CreateCommentMutation>(
@@ -90,6 +90,7 @@ export async function replyToComment(
     {
       input: applyActorOverrides(
         {
+          issueId: input.issueId,
           parentId: input.parentId,
           body: input.body,
         },

@@ -198,6 +198,7 @@ describe("replyToComment", () => {
     const result = await replyToComment(
       client,
       {
+        issueId: "issue-1",
         parentId: "comment-1",
         body: "This is a reply",
       },
@@ -213,7 +214,11 @@ describe("replyToComment", () => {
       user: MOCK_USER,
     });
     expect(client.request).toHaveBeenCalledWith(expect.anything(), {
-      input: { parentId: "comment-1", body: "This is a reply" },
+      input: {
+        issueId: "issue-1",
+        parentId: "comment-1",
+        body: "This is a reply",
+      },
     });
   });
 
@@ -226,7 +231,11 @@ describe("replyToComment", () => {
     });
 
     await expect(
-      replyToComment(client, { parentId: "comment-1", body: "reply" }, {}),
+      replyToComment(
+        client,
+        { issueId: "issue-1", parentId: "comment-1", body: "reply" },
+        {},
+      ),
     ).rejects.toThrow("Failed to create reply");
   });
 });

@@ -22,6 +22,7 @@ interface ListCommentOptions extends CommandOptions {
 
 interface ReplyCommentOptions extends CommandOptions {
   body?: string;
+  issue?: string;
 }
 
 interface EditCommentOptions extends CommandOptions {
@@ -113,8 +114,12 @@ export function setupCommentsCommands(program: Command): void {
 
   comments
     .command("reply <comment>")
-    .description("reply to a comment")
+    .description("reply to a comment (threaded)")
     .option("--body <text>", "reply body (required, markdown supported)")
+    .option(
+      "--issue <issue>",
+      "issue the parent comment belongs to (required, UUID or ABC-123)",
+    )
     .action(
       handleCommand(async (...args: unknown[]) => {
         const [comment, options, command] = args as [
@@ -127,10 +132,15 @@ export function setupCommentsCommands(program: Command): void {
         if (!options.body) {
           throw new Error("--body is required");
         }
+        if (!options.issue) {
+          throw new Error("--issue is required");
+        }
 
+        const resolvedIssueId = await resolveIssueId(ctx.sdk, options.issue);
         const result = await replyToComment(
           ctx.gql,
           {
+            issueId: resolvedIssueId,
             parentId: comment,
             body: options.body,
           },

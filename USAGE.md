@@ -177,7 +177,7 @@ a comment is a text entry on an issue. comments support markdown and threaded re
 commands:
   list <issue>      list comments on an issue
   create <issue>    create a comment on an issue
-  reply <comment>   reply to a comment
+  reply <comment>   reply to a comment (threaded)
   edit <comment>    edit a comment
   delete <comment>  delete a comment
 
@@ -193,7 +193,8 @@ create options:
   --body <text>  comment body (required, markdown supported)
 
 reply options:
-  --body <text>  reply body (required, markdown supported)
+  --body <text>    reply body (required, markdown supported)
+  --issue <issue>  issue the parent comment belongs to (required, UUID or ABC-123)
 
 edit options:
   --body <text>  new comment body (required, markdown supported)

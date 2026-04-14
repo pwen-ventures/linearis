@@ -35,6 +35,7 @@ export async function listComments(client, issueId, options = {}) {
 export async function replyToComment(client, input, actorOverrides) {
     const result = await client.request(CreateCommentDocument, {
         input: applyActorOverrides({
+            issueId: input.issueId,
             parentId: input.parentId,
             body: input.body,
         }, actorOverrides),
