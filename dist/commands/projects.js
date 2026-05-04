@@ -4,6 +4,7 @@ import { handleCommand, outputSuccess, parseLimit } from "../common/output.js";
 import { formatDomainUsage } from "../common/usage.js";
 import { resolveProjectId, resolveProjectLabelIds, } from "../resolvers/project-resolver.js";
 import { resolveProjectStatusId } from "../resolvers/project-status-resolver.js";
+import { resolveScopedTeamId } from "../common/team-scope.js";
 import { resolveTeamId } from "../resolvers/team-resolver.js";
 import { resolveUserId } from "../resolvers/user-resolver.js";
 import { createProject, getProject, listProjects, updateProject, } from "../services/project-service.js";
@@ -48,9 +49,7 @@ export function setupProjectsCommands(program) {
         .action(handleCommand(async (...args) => {
         const [options, command] = args;
         const ctx = createContext(command.parent.parent.opts());
-        const teamId = options.team
-            ? await resolveTeamId(ctx.sdk, options.team)
-            : ctx.defaultTeamId;
+        const teamId = await resolveScopedTeamId(ctx, options.team);
         const result = await listProjects(ctx.gql, {
             limit: parseLimit(options.limit),
             after: options.after,

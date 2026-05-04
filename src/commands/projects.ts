@@ -2,6 +2,7 @@ import type { Command } from "commander";
 import { createContext } from "../common/context.js";
 import { invalidParameterError } from "../common/errors.js";
 import { handleCommand, outputSuccess, parseLimit } from "../common/output.js";
+import { resolveScopedTeamId } from "../common/team-scope.js";
 import { type DomainMeta, formatDomainUsage } from "../common/usage.js";
 import type { ProjectCreateInput, ProjectUpdateInput } from "../gql/graphql.js";
 import {
@@ -97,9 +98,7 @@ export function setupProjectsCommands(program: Command): void {
       handleCommand(async (...args: unknown[]) => {
         const [options, command] = args as [ListOptions, Command];
         const ctx = createContext(command.parent!.parent!.opts());
-        const teamId = options.team
-          ? await resolveTeamId(ctx.sdk, options.team)
-          : ctx.defaultTeamId;
+        const teamId = await resolveScopedTeamId(ctx, options.team);
         const result = await listProjects(ctx.gql, {
           limit: parseLimit(options.limit),
           after: options.after,

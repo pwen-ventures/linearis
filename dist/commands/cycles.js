@@ -3,7 +3,7 @@ import { invalidParameterError, notFoundError, requiresParameterError, } from ".
 import { handleCommand, outputSuccess, parseLimit } from "../common/output.js";
 import { formatDomainUsage } from "../common/usage.js";
 import { resolveCycleId } from "../resolvers/cycle-resolver.js";
-import { resolveTeamId } from "../resolvers/team-resolver.js";
+import { resolveScopedTeamId } from "../common/team-scope.js";
 import { getCycle, listCycles } from "../services/cycle-service.js";
 export const CYCLES_META = {
     name: "cycles",
@@ -37,9 +37,7 @@ export function setupCyclesCommands(program) {
             throw invalidParameterError("--after", "cannot be used with --window");
         }
         const ctx = createContext(command.parent.parent.opts());
-        const teamId = options.team
-            ? await resolveTeamId(ctx.sdk, options.team)
-            : ctx.defaultTeamId;
+        const teamId = await resolveScopedTeamId(ctx, options.team);
         const result = await listCycles(ctx.gql, teamId, options.active || false, { limit: parseLimit(options.limit), after: options.after });
         if (options.window) {
             const n = parseInt(options.window, 10);

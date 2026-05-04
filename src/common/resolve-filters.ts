@@ -4,7 +4,6 @@ import { resolveLabelIds } from "../resolvers/label-resolver.js";
 import { resolveMilestoneId } from "../resolvers/milestone-resolver.js";
 import { resolveProjectId } from "../resolvers/project-resolver.js";
 import { resolveStatusId } from "../resolvers/status-resolver.js";
-import { resolveTeamId } from "../resolvers/team-resolver.js";
 import { resolveUserId } from "../resolvers/user-resolver.js";
 import type { CommandContext } from "./context.js";
 import { invalidParameterError } from "./errors.js";
@@ -18,6 +17,7 @@ import {
   validateFilterDependencies,
   validatePriority,
 } from "./issue-filter.js";
+import { resolveScopedTeamId } from "./team-scope.js";
 
 /**
  * Resolves raw CLI filter flags into validated IssueFilterOptions with UUIDs.
@@ -103,10 +103,9 @@ export async function resolveFilterOptions(
   // 4. ID resolution
   const resolved: IssueFilterOptions = {};
 
-  if (opts.team) {
-    resolved.teamId = await resolveTeamId(ctx.sdk, opts.team);
-  } else if (ctx.defaultTeamId) {
-    resolved.teamId = ctx.defaultTeamId;
+  const scopedTeamId = await resolveScopedTeamId(ctx, opts.team);
+  if (scopedTeamId) {
+    resolved.teamId = scopedTeamId;
   }
   if (opts.assignee) {
     resolved.assigneeId = await resolveUserId(ctx.sdk, opts.assignee);

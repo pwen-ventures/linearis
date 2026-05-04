@@ -1,7 +1,7 @@
 import { createContext } from "../common/context.js";
 import { handleCommand, outputSuccess, parseLimit } from "../common/output.js";
+import { resolveScopedTeamId } from "../common/team-scope.js";
 import { formatDomainUsage } from "../common/usage.js";
-import { resolveTeamId } from "../resolvers/team-resolver.js";
 import { listLabels } from "../services/label-service.js";
 export const LABELS_META = {
     name: "labels",
@@ -25,9 +25,7 @@ export function setupLabelsCommands(program) {
         .action(handleCommand(async (...args) => {
         const [options, command] = args;
         const ctx = createContext(command.parent.parent.opts());
-        const teamId = options.team
-            ? await resolveTeamId(ctx.sdk, options.team)
-            : ctx.defaultTeamId;
+        const teamId = await resolveScopedTeamId(ctx, options.team);
         const result = await listLabels(ctx.gql, teamId, {
             limit: parseLimit(options.limit),
             after: options.after,

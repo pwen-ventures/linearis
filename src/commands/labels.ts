@@ -1,8 +1,8 @@
 import type { Command } from "commander";
 import { type CommandOptions, createContext } from "../common/context.js";
 import { handleCommand, outputSuccess, parseLimit } from "../common/output.js";
+import { resolveScopedTeamId } from "../common/team-scope.js";
 import { type DomainMeta, formatDomainUsage } from "../common/usage.js";
-import { resolveTeamId } from "../resolvers/team-resolver.js";
 import { listLabels } from "../services/label-service.js";
 
 interface ListLabelsOptions extends CommandOptions {
@@ -38,9 +38,7 @@ export function setupLabelsCommands(program: Command): void {
         const [options, command] = args as [ListLabelsOptions, Command];
         const ctx = createContext(command.parent!.parent!.opts());
 
-        const teamId = options.team
-          ? await resolveTeamId(ctx.sdk, options.team)
-          : ctx.defaultTeamId;
+        const teamId = await resolveScopedTeamId(ctx, options.team);
 
         const result = await listLabels(ctx.gql, teamId, {
           limit: parseLimit(options.limit),

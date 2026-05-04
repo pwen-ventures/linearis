@@ -6,9 +6,9 @@ import {
   requiresParameterError,
 } from "../common/errors.js";
 import { handleCommand, outputSuccess, parseLimit } from "../common/output.js";
+import { resolveScopedTeamId } from "../common/team-scope.js";
 import { type DomainMeta, formatDomainUsage } from "../common/usage.js";
 import { resolveCycleId } from "../resolvers/cycle-resolver.js";
-import { resolveTeamId } from "../resolvers/team-resolver.js";
 import { type Cycle, getCycle, listCycles } from "../services/cycle-service.js";
 
 interface CycleListOptions extends CommandOptions {
@@ -66,10 +66,9 @@ export function setupCyclesCommands(program: Command): void {
         const ctx = createContext(command.parent!.parent!.opts());
 
         // Resolve team filter if provided, otherwise fall back to the
-        // profile's default team (when configured).
-        const teamId = options.team
-          ? await resolveTeamId(ctx.sdk, options.team)
-          : ctx.defaultTeamId;
+        // profile's default team (when configured). Profiles with a
+        // defaultTeamId reject overrides to a different team.
+        const teamId = await resolveScopedTeamId(ctx, options.team);
 
         // Fetch cycles
         const result = await listCycles(

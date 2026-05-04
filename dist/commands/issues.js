@@ -10,7 +10,7 @@ import { resolveLabelIds } from "../resolvers/label-resolver.js";
 import { resolveMilestoneId } from "../resolvers/milestone-resolver.js";
 import { resolveProjectId } from "../resolvers/project-resolver.js";
 import { resolveStatusId } from "../resolvers/status-resolver.js";
-import { resolveTeamId } from "../resolvers/team-resolver.js";
+import { resolveScopedTeamId } from "../common/team-scope.js";
 import { resolveUserId } from "../resolvers/user-resolver.js";
 import { buildIssueFilter } from "../services/issue-filter.js";
 import { createIssueRelation, deleteIssueRelation, findIssueRelation, } from "../services/issue-relation-service.js";
@@ -245,9 +245,7 @@ export function setupIssuesCommands(program) {
         const [title, options, command] = args;
         const ctx = createContext(command.parent.parent.opts());
         const relationActions = parseRelationFlags(options);
-        const teamId = options.team
-            ? await resolveTeamId(ctx.sdk, options.team)
-            : ctx.defaultTeamId;
+        const teamId = await resolveScopedTeamId(ctx, options.team);
         if (!teamId) {
             throw new Error("--team is required (or configure a defaultTeamId on the active profile)");
         }

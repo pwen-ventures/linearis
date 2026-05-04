@@ -4,8 +4,8 @@ import { resolveLabelIds } from "../resolvers/label-resolver.js";
 import { resolveMilestoneId } from "../resolvers/milestone-resolver.js";
 import { resolveProjectId } from "../resolvers/project-resolver.js";
 import { resolveStatusId } from "../resolvers/status-resolver.js";
-import { resolveTeamId } from "../resolvers/team-resolver.js";
 import { resolveUserId } from "../resolvers/user-resolver.js";
+import { resolveScopedTeamId } from "./team-scope.js";
 import { invalidParameterError } from "./errors.js";
 import { parseDueDate } from "./identifier.js";
 import { parseCommaSeparated, validateDateRange, validateEstimate, validateFilterDependencies, validatePriority, } from "./issue-filter.js";
@@ -57,11 +57,9 @@ export async function resolveFilterOptions(ctx, opts) {
     validateDateRange(opts.completedAfter, opts.completedBefore, "completed date");
     validateDateRange(opts.updatedAfter, opts.updatedBefore, "updated date");
     const resolved = {};
-    if (opts.team) {
-        resolved.teamId = await resolveTeamId(ctx.sdk, opts.team);
-    }
-    else if (ctx.defaultTeamId) {
-        resolved.teamId = ctx.defaultTeamId;
+    const scopedTeamId = await resolveScopedTeamId(ctx, opts.team);
+    if (scopedTeamId) {
+        resolved.teamId = scopedTeamId;
     }
     if (opts.assignee) {
         resolved.assigneeId = await resolveUserId(ctx.sdk, opts.assignee);
