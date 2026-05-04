@@ -5,10 +5,10 @@ import { resolveMilestoneId } from "../resolvers/milestone-resolver.js";
 import { resolveProjectId } from "../resolvers/project-resolver.js";
 import { resolveStatusId } from "../resolvers/status-resolver.js";
 import { resolveUserId } from "../resolvers/user-resolver.js";
-import { resolveScopedTeamId } from "./team-scope.js";
 import { invalidParameterError } from "./errors.js";
 import { parseDueDate } from "./identifier.js";
 import { parseCommaSeparated, validateDateRange, validateEstimate, validateFilterDependencies, validatePriority, } from "./issue-filter.js";
+import { resolveScopedTeamId } from "./team-scope.js";
 export async function resolveFilterOptions(ctx, opts) {
     const validateDateOption = (value, flag) => {
         if (!value) {
@@ -51,7 +51,6 @@ export async function resolveFilterOptions(ctx, opts) {
         parsedEstimate = parseIntegerOption(opts.estimate, "--estimate");
         validateEstimate(parsedEstimate);
     }
-    validateFilterDependencies(opts);
     validateDateRange(opts.dueAfter, opts.dueBefore, "due date");
     validateDateRange(opts.createdAfter, opts.createdBefore, "created date");
     validateDateRange(opts.completedAfter, opts.completedBefore, "completed date");
@@ -61,6 +60,7 @@ export async function resolveFilterOptions(ctx, opts) {
     if (scopedTeamId) {
         resolved.teamId = scopedTeamId;
     }
+    validateFilterDependencies(opts, { hasTeam: Boolean(scopedTeamId) });
     if (opts.assignee) {
         resolved.assigneeId = await resolveUserId(ctx.sdk, opts.assignee);
     }

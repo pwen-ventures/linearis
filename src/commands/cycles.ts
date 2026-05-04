@@ -53,9 +53,6 @@ export function setupCyclesCommands(program: Command): void {
     .action(
       handleCommand(async (...args: unknown[]) => {
         const [options, command] = args as [CycleListOptions, Command];
-        if (options.window && !options.team) {
-          throw requiresParameterError("--window", "--team");
-        }
         if (options.window && options.after) {
           throw invalidParameterError(
             "--after",
@@ -69,6 +66,10 @@ export function setupCyclesCommands(program: Command): void {
         // profile's default team (when configured). Profiles with a
         // defaultTeamId reject overrides to a different team.
         const teamId = await resolveScopedTeamId(ctx, options.team);
+
+        if (options.window && !teamId) {
+          throw requiresParameterError("--window", "--team");
+        }
 
         // Fetch cycles
         const result = await listCycles(

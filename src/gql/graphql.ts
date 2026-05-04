@@ -4269,7 +4269,7 @@ export type Document = Node & {
   lastAppliedTemplate?: Maybe<Template>;
   /** The project that the document is associated with. Null if the document belongs to a different parent entity type. */
   project?: Maybe<Project>;
-  /** [Internal] The release that the document is associated with. Null if the document belongs to a different parent entity type. */
+  /** The release that the document is associated with. Null if the document belongs to a different parent entity type. */
   release?: Maybe<Release>;
   /** The document's unique URL slug, used to construct human-readable URLs. */
   slugId: Scalars['String']['output'];
@@ -4432,7 +4432,7 @@ export type DocumentCreateInput = {
   lastAppliedTemplateId?: InputMaybe<Scalars['String']['input']>;
   /** Related project for the document. */
   projectId?: InputMaybe<Scalars['String']['input']>;
-  /** [Internal] Related release for the document. */
+  /** Related release for the document. */
   releaseId?: InputMaybe<Scalars['String']['input']>;
   /** [Internal] The resource folder containing the document. */
   resourceFolderId?: InputMaybe<Scalars['String']['input']>;
@@ -4611,7 +4611,7 @@ export type DocumentSearchResult = Node & {
   metadata: Scalars['JSONObject']['output'];
   /** The project that the document is associated with. Null if the document belongs to a different parent entity type. */
   project?: Maybe<Project>;
-  /** [Internal] The release that the document is associated with. Null if the document belongs to a different parent entity type. */
+  /** The release that the document is associated with. Null if the document belongs to a different parent entity type. */
   release?: Maybe<Release>;
   /** The document's unique URL slug, used to construct human-readable URLs. */
   slugId: Scalars['String']['output'];
@@ -4674,7 +4674,7 @@ export type DocumentUpdateInput = {
   lastAppliedTemplateId?: InputMaybe<Scalars['String']['input']>;
   /** Related project for the document. */
   projectId?: InputMaybe<Scalars['String']['input']>;
-  /** [Internal] Related release for the document. */
+  /** Related release for the document. */
   releaseId?: InputMaybe<Scalars['String']['input']>;
   /** [Internal] The resource folder containing the document. */
   resourceFolderId?: InputMaybe<Scalars['String']['input']>;
@@ -5069,7 +5069,7 @@ export type EntityExternalLinkCreateInput = {
   label: Scalars['String']['input'];
   /** The project associated with the link. */
   projectId?: InputMaybe<Scalars['String']['input']>;
-  /** [Internal] The release associated with the link. */
+  /** The release associated with the link. */
   releaseId?: InputMaybe<Scalars['String']['input']>;
   /** [Internal] The resource folder containing the link. */
   resourceFolderId?: InputMaybe<Scalars['String']['input']>;
@@ -5367,9 +5367,9 @@ export type Favorite = Node & {
   projectTeam?: Maybe<Team>;
   /** The favorited pull request. */
   pullRequest?: Maybe<PullRequest>;
-  /** [ALPHA] The favorited release. */
+  /** The favorited release. */
   release?: Maybe<Release>;
-  /** [ALPHA] The favorited release pipeline. */
+  /** The favorited release pipeline. */
   releasePipeline?: Maybe<ReleasePipeline>;
   /** The position of this item in the user's favorites list. Lower values appear first. Used to maintain user-defined ordering within the sidebar. */
   sortOrder: Scalars['Float']['output'];
@@ -5448,9 +5448,9 @@ export type FavoriteCreateInput = {
   projectTab?: InputMaybe<ProjectTab>;
   /** The identifier of the pull request to favorite. */
   pullRequestId?: InputMaybe<Scalars['String']['input']>;
-  /** [ALPHA] The identifier of the release to favorite. */
+  /** The identifier of the release to favorite. */
   releaseId?: InputMaybe<Scalars['String']['input']>;
-  /** [ALPHA] The identifier of the release pipeline to favorite. */
+  /** The identifier of the release pipeline to favorite. */
   releasePipelineId?: InputMaybe<Scalars['String']['input']>;
   /** The position of the item in the favorites list. */
   sortOrder?: InputMaybe<Scalars['Float']['input']>;
@@ -7652,7 +7652,7 @@ export type Issue = Node & {
   recurringIssueTemplate?: Maybe<Template>;
   /** Relations associated with this issue. */
   relations: IssueRelationConnection;
-  /** [ALPHA] Releases associated with the issue. */
+  /** Releases associated with the issue. */
   releases: ReleaseConnection;
   /** Shared access metadata for this issue. */
   sharedAccess: IssueSharedAccess;
@@ -8040,7 +8040,7 @@ export type IssueCollectionFilter = {
   reactions?: InputMaybe<ReactionCollectionFilter>;
   /** [ALPHA] Filters that the recurring issue template must satisfy. */
   recurringIssueTemplate?: InputMaybe<NullableTemplateFilter>;
-  /** [ALPHA] Filters that the issue's releases must satisfy. */
+  /** Filters that the issue's releases must satisfy. */
   releases?: InputMaybe<ReleaseCollectionFilter>;
   /** [Internal] Comparator for the issues content. */
   searchableContent?: InputMaybe<ContentComparator>;
@@ -8131,7 +8131,7 @@ export type IssueCreateInput = {
   projectMilestoneId?: InputMaybe<Scalars['String']['input']>;
   /** The comment the issue is referencing. */
   referenceCommentId?: InputMaybe<Scalars['String']['input']>;
-  /** [ALPHA] The identifiers of the releases to associate with this issue. */
+  /** The identifiers of the releases to associate with this issue. */
   releaseIds?: InputMaybe<Array<Scalars['String']['input']>>;
   /** [Internal] The time at which an issue will be considered in breach of SLA. */
   slaBreachesAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -8350,7 +8350,7 @@ export type IssueFilter = {
   reactions?: InputMaybe<ReactionCollectionFilter>;
   /** [ALPHA] Filters that the recurring issue template must satisfy. */
   recurringIssueTemplate?: InputMaybe<NullableTemplateFilter>;
-  /** [ALPHA] Filters that the issue's releases must satisfy. */
+  /** Filters that the issue's releases must satisfy. */
   releases?: InputMaybe<ReleaseCollectionFilter>;
   /** [Internal] Comparator for the issues content. */
   searchableContent?: InputMaybe<ContentComparator>;
@@ -8411,7 +8411,7 @@ export type IssueHistory = Node & {
   addedLabelIds?: Maybe<Array<Scalars['String']['output']>>;
   /** The labels that were added to the issue. */
   addedLabels?: Maybe<Array<IssueLabel>>;
-  /** [ALPHA] ID's of releases that the issue was added to. */
+  /** ID's of releases that the issue was added to. */
   addedToReleaseIds?: Maybe<Array<Scalars['String']['output']>>;
   /** The releases that the issue was added to. */
   addedToReleases?: Maybe<Array<Release>>;
@@ -8489,7 +8489,7 @@ export type IssueHistory = Node & {
   issueImport?: Maybe<IssueImport>;
   /** Changed issue relationships. */
   relationChanges?: Maybe<Array<IssueRelationHistoryPayload>>;
-  /** [ALPHA] ID's of releases that the issue was removed from. */
+  /** ID's of releases that the issue was removed from. */
   removedFromReleaseIds?: Maybe<Array<Scalars['String']['output']>>;
   /** The releases that the issue was removed from. */
   removedFromReleases?: Maybe<Array<Release>>;
@@ -9237,7 +9237,7 @@ export type IssueSearchResult = Node & {
   recurringIssueTemplate?: Maybe<Template>;
   /** Relations associated with this issue. */
   relations: IssueRelationConnection;
-  /** [ALPHA] Releases associated with the issue. */
+  /** Releases associated with the issue. */
   releases: ReleaseConnection;
   /** Shared access metadata for this issue. */
   sharedAccess: IssueSharedAccess;
@@ -9553,7 +9553,7 @@ export type IssueSortInput = {
   priority?: InputMaybe<PrioritySort>;
   /** Sort by Project name */
   project?: InputMaybe<ProjectSort>;
-  /** [ALPHA] Sort by most recent release date */
+  /** Sort by most recent release date */
   release?: InputMaybe<ReleaseSort>;
   /** Sort by the root issue */
   rootIssue?: InputMaybe<RootIssueSort>;
@@ -9778,7 +9778,7 @@ export type IssueTitleSuggestionFromCustomerRequestPayload = {
   title: Scalars['String']['output'];
 };
 
-/** [Internal] A join entity linking an issue to a release for release tracking. Each record represents an association between a single issue and a single release, along with metadata about the source of the link (e.g., which pull requests connected the issue to the release). Creating or deleting these associations automatically records the change in issue history. */
+/** A join entity linking an issue to a release for release tracking. Each record represents an association between a single issue and a single release, along with metadata about the source of the link (e.g., which pull requests connected the issue to the release). Creating or deleting these associations automatically records the change in issue history. */
 export type IssueToRelease = Node & {
   __typename?: 'IssueToRelease';
   /** The time at which the entity was archived. Null if the entity has not been archived. */
@@ -9805,7 +9805,7 @@ export type IssueToReleaseConnection = {
   pageInfo: PageInfo;
 };
 
-/** [ALPHA] Input for creating a new association between an issue and a release. Both an issue identifier and a release identifier must be provided. */
+/** Input for creating a new association between an issue and a release. Both an issue identifier and a release identifier must be provided. */
 export type IssueToReleaseCreateInput = {
   /** The identifier in UUID v4 format. If none is provided, the backend will generate one. */
   id?: InputMaybe<Scalars['String']['input']>;
@@ -9822,7 +9822,7 @@ export type IssueToReleaseEdge = {
   node: IssueToRelease;
 };
 
-/** [ALPHA] The result of an issue-to-release mutation, containing the created or updated association and a success indicator. */
+/** The result of an issue-to-release mutation, containing the created or updated association and a success indicator. */
 export type IssueToReleasePayload = {
   __typename?: 'IssueToReleasePayload';
   /** The issueToRelease that was created or updated. */
@@ -10569,11 +10569,11 @@ export type Mutation = {
   issueRemoveLabel: IssuePayload;
   /** Subscribes a user to an issue. */
   issueSubscribe: IssuePayload;
-  /** [ALPHA] Creates a new association between an issue and a release, linking the issue to the release for tracking purposes. */
+  /** Creates a new association between an issue and a release, linking the issue to the release for tracking purposes. */
   issueToReleaseCreate: IssueToReleasePayload;
-  /** [ALPHA] Deletes an issue-to-release association by its identifier, removing the issue from the release. */
+  /** Deletes an issue-to-release association by its identifier, removing the issue from the release. */
   issueToReleaseDelete: DeletePayload;
-  /** [ALPHA] Deletes an issue-to-release association by looking up the issue and release identifiers, removing the issue from the release. */
+  /** Deletes an issue-to-release association by looking up the issue and release identifiers, removing the issue from the release. */
   issueToReleaseDeleteByIssueAndRelease: DeletePayload;
   /** Unarchives an issue. */
   issueUnarchive: IssueArchivePayload;
@@ -10735,51 +10735,51 @@ export type Mutation = {
   reactionDelete: DeletePayload;
   /** Manually update Google Sheets data. */
   refreshGoogleSheetsData: IntegrationPayload;
-  /** [ALPHA] Archives a release. */
+  /** Archives a release. */
   releaseArchive: ReleaseArchivePayload;
-  /** [ALPHA] Marks a release as completed. If version is provided, completes that specific release; otherwise completes the most recent started release. */
+  /** Marks a release as completed. If version is provided, completes that specific release; otherwise completes the most recent started release. */
   releaseComplete: ReleasePayload;
-  /** [ALPHA] Marks a release as completed using an access key. If version is provided, completes that specific release; otherwise completes the most recent started release. The pipeline is inferred from the access key. */
+  /** Marks a release as completed using an access key. If version is provided, completes that specific release; otherwise completes the most recent started release. The pipeline is inferred from the access key. */
   releaseCompleteByAccessKey: ReleasePayload;
-  /** [ALPHA] Creates a new release in a pipeline. If no stage is specified, defaults to the first completed stage for continuous pipelines or the first started stage for scheduled pipelines. */
+  /** Creates a new release in a pipeline. If no stage is specified, defaults to the first completed stage for continuous pipelines or the first started stage for scheduled pipelines. */
   releaseCreate: ReleasePayload;
-  /** [ALPHA] Moves a release to the trash bin. Trashed releases are archived and will be permanently deleted after a retention period. If the release is already archived, it is marked as trashed with a fresh archive timestamp. */
+  /** Moves a release to the trash bin. Trashed releases are archived and will be permanently deleted after a retention period. If the release is already archived, it is marked as trashed with a fresh archive timestamp. */
   releaseDelete: ReleaseArchivePayload;
-  /** [ALPHA] Creates a release note. */
+  /** Creates a release note. */
   releaseNoteCreate: ReleaseNotePayload;
-  /** [ALPHA] Deletes a release note. */
+  /** Deletes a release note. */
   releaseNoteDelete: DeletePayload;
-  /** [ALPHA] Updates a release note. */
+  /** Updates a release note. */
   releaseNoteUpdate: ReleaseNotePayload;
-  /** [ALPHA] Archives a release pipeline. */
+  /** Archives a release pipeline. */
   releasePipelineArchive: ReleasePipelineArchivePayload;
-  /** [ALPHA] Creates a new release pipeline with default stages. Subject to plan entitlement and quota limits. */
+  /** Creates a new release pipeline with default stages. Subject to plan entitlement and quota limits. */
   releasePipelineCreate: ReleasePipelinePayload;
-  /** [ALPHA] Permanently deletes a release pipeline and all associated stages and releases. */
+  /** Permanently deletes a release pipeline and all associated stages and releases. */
   releasePipelineDelete: DeletePayload;
-  /** [ALPHA] Unarchives a release pipeline. */
+  /** Unarchives a release pipeline. */
   releasePipelineUnarchive: ReleasePipelineArchivePayload;
-  /** [ALPHA] Updates an existing release pipeline. Supports updating name, slug, type, production flag, path patterns, and team associations. Private teams that the current user cannot access are preserved in the team list. */
+  /** Updates an existing release pipeline. Supports updating name, slug, type, production flag, path patterns, and team associations. Private teams that the current user cannot access are preserved in the team list. */
   releasePipelineUpdate: ReleasePipelinePayload;
-  /** [ALPHA] Archives a release stage. Only started-type stages can be archived, and only if they have no active releases and at least one other stage of the same type remains. Cannot archive the last non-frozen started stage. */
+  /** Archives a release stage. Only started-type stages can be archived, and only if they have no active releases and at least one other stage of the same type remains. Cannot archive the last non-frozen started stage. */
   releaseStageArchive: ReleaseStageArchivePayload;
-  /** [ALPHA] Creates a new release stage in a pipeline. Non-started stages must use default names and colors, and only one stage of each non-started type is allowed per pipeline. Started stages can optionally be frozen, but at least one non-frozen started stage must remain. */
+  /** Creates a new release stage in a pipeline. Non-started stages must use default names and colors, and only one stage of each non-started type is allowed per pipeline. Started stages can optionally be frozen, but at least one non-frozen started stage must remain. */
   releaseStageCreate: ReleaseStagePayload;
-  /** [ALPHA] Unarchives a release stage. */
+  /** Unarchives a release stage. */
   releaseStageUnarchive: ReleaseStageArchivePayload;
-  /** [ALPHA] Updates an existing release stage. Only started-type stages can be edited. Supports updating name, color, position, and frozen status. */
+  /** Updates an existing release stage. Only started-type stages can be edited. Supports updating name, color, position, and frozen status. */
   releaseStageUpdate: ReleaseStagePayload;
-  /** [ALPHA] Syncs release data by resolving issue and pull request references and associating them with a release. For continuous pipelines, creates a new completed release. For scheduled pipelines, finds or creates a started release and accumulates issues into it. */
+  /** Syncs release data by resolving issue and pull request references and associating them with a release. For continuous pipelines, creates a new completed release. For scheduled pipelines, finds or creates a started release and accumulates issues into it. */
   releaseSync: ReleasePayload;
-  /** [ALPHA] Syncs release data using an access key for CI/CD integration. The pipeline is automatically inferred from the access key's configured resources, so no pipeline ID is needed in the input. */
+  /** Syncs release data using an access key for CI/CD integration. The pipeline is automatically inferred from the access key's configured resources, so no pipeline ID is needed in the input. */
   releaseSyncByAccessKey: ReleasePayload;
-  /** [ALPHA] Unarchives a release. */
+  /** Unarchives a release. */
   releaseUnarchive: ReleaseArchivePayload;
-  /** [ALPHA] Updates an existing release by ID. Supports updating name, description, version, commit SHA, pipeline, stage, and dates. */
+  /** Updates an existing release by ID. Supports updating name, description, version, commit SHA, pipeline, stage, and dates. */
   releaseUpdate: ReleasePayload;
-  /** [ALPHA] Updates a release by pipeline identifier. Finds the release by version or latest started/planned release, and optionally transitions it to a new stage by name. */
+  /** Updates a release by pipeline identifier. Finds the release by version or latest started/planned release, and optionally transitions it to a new stage by name. */
   releaseUpdateByPipeline: ReleasePayload;
-  /** [ALPHA] Updates a release by pipeline using an access key. */
+  /** Updates a release by pipeline using an access key. */
   releaseUpdateByPipelineByAccessKey: ReleasePayload;
   /** Re-sends a workspace invitation email for the specified invite ID. */
   resendOrganizationInvite: DeletePayload;
@@ -13696,7 +13696,7 @@ export type NullableIssueFilter = {
   reactions?: InputMaybe<ReactionCollectionFilter>;
   /** [ALPHA] Filters that the recurring issue template must satisfy. */
   recurringIssueTemplate?: InputMaybe<NullableTemplateFilter>;
-  /** [ALPHA] Filters that the issue's releases must satisfy. */
+  /** Filters that the issue's releases must satisfy. */
   releases?: InputMaybe<ReleaseCollectionFilter>;
   /** [Internal] Comparator for the issues content. */
   searchableContent?: InputMaybe<ContentComparator>;
@@ -13950,7 +13950,7 @@ export type NullableTeamFilter = {
   parent?: InputMaybe<NullableTeamFilter>;
   /** Comparator for the team privacy. */
   private?: InputMaybe<BooleanComparator>;
-  /** [ALPHA] Filters that the team's release pipelines must satisfy. */
+  /** Filters that the team's release pipelines must satisfy. */
   releasePipelines?: InputMaybe<ReleasePipelineCollectionFilter>;
   /** Comparator for the time at which the team was retired. */
   retiredAt?: InputMaybe<NullableDateComparator>;
@@ -14297,7 +14297,7 @@ export type Organization = Node & {
   projectUpdatesReminderFrequency: ProjectUpdateReminderFrequency;
   /** The feature release channel the workspace belongs to, which controls access to pre-release features. */
   releaseChannel: ReleaseChannel;
-  /** [Internal] Whether release management is enabled for the workspace. */
+  /** Whether release management is enabled for the workspace. */
   releasesEnabled: Scalars['Boolean']['output'];
   /** [Internal] Whether agent invocation is restricted to full workspace members. */
   restrictAgentInvocationToMembers?: Maybe<Scalars['Boolean']['output']>;
@@ -17755,15 +17755,15 @@ export type Query = {
   issueSearch: IssueConnection;
   /** Suggests an issue title based on a customer request message using AI summarization. */
   issueTitleSuggestionFromCustomerRequest: IssueTitleSuggestionFromCustomerRequestPayload;
-  /** [ALPHA] One specific issue-to-release association, looked up by its unique identifier. */
+  /** One specific issue-to-release association, looked up by its unique identifier. */
   issueToRelease: IssueToRelease;
-  /** [ALPHA] All issue-to-release associations. Returns a paginated list of all issue-to-release links visible to the authenticated user. */
+  /** All issue-to-release associations. Returns a paginated list of all issue-to-release links visible to the authenticated user. */
   issueToReleases: IssueToReleaseConnection;
   /** Find issue based on the VCS branch name. */
   issueVcsBranchSearch?: Maybe<Issue>;
   /** All issues. Returns a paginated list of issues visible to the authenticated user. Can be filtered by various criteria including team, assignee, state, labels, project, and cycle. */
   issues: IssueConnection;
-  /** [ALPHA] Returns the latest release for the pipeline associated with the access key. */
+  /** Returns the latest release for the pipeline associated with the access key. */
   latestReleaseByAccessKey?: Maybe<Release>;
   /** [Internal] Lists Microsoft Teams teams and channels accessible to the connecting user. Uses the user's microsoftPersonal integration for auth. Used by the project channel picker dialog to populate the team/channel dropdowns. */
   microsoftTeamsChannels: MicrosoftTeamsChannelsPayload;
@@ -17823,25 +17823,25 @@ export type Query = {
   pushSubscriptionTest: PushSubscriptionTestPayload;
   /** The current rate limit status for the authenticated client, including remaining quota and reset timing for each limit type. */
   rateLimitStatus: RateLimitPayload;
-  /** [ALPHA] Fetch a single release by its UUID or slug identifier. */
+  /** Fetch a single release by its UUID or slug identifier. */
   release: Release;
-  /** [ALPHA] Fetch a release note by its UUID or slug identifier. */
+  /** Fetch a release note by its UUID or slug identifier. */
   releaseNote: ReleaseNote;
-  /** [ALPHA] Release notes in the workspace. */
+  /** Release notes in the workspace. */
   releaseNotes: ReleaseNoteConnection;
-  /** [ALPHA] Fetch a single release pipeline by its UUID or slug identifier. */
+  /** Fetch a single release pipeline by its UUID or slug identifier. */
   releasePipeline: ReleasePipeline;
-  /** [ALPHA] Returns a release pipeline by ID. Requires the access key to have access to the pipeline. */
+  /** Returns a release pipeline by ID. Requires the access key to have access to the pipeline. */
   releasePipelineByAccessKey: ReleasePipeline;
-  /** [ALPHA] All release pipelines in the workspace, with optional filtering and sorting. */
+  /** All release pipelines in the workspace, with optional filtering and sorting. */
   releasePipelines: ReleasePipelineConnection;
-  /** [ALPHA] Search releases with optional text matching against name, version, and pipeline name. When no search term is provided, returns releases ordered by stage priority (started > planned > completed > canceled). */
+  /** Search releases with optional text matching against name, version, and pipeline name. When no search term is provided, returns releases ordered by stage priority (started > planned > completed > canceled). */
   releaseSearch: Array<Release>;
-  /** [ALPHA] Fetch a single release stage by its UUID. */
+  /** Fetch a single release stage by its UUID. */
   releaseStage: ReleaseStage;
-  /** [ALPHA] All release stages in the workspace, with optional filtering. */
+  /** All release stages in the workspace, with optional filtering. */
   releaseStages: ReleaseStageConnection;
-  /** [ALPHA] All releases in the workspace, with optional filtering and sorting. */
+  /** All releases in the workspace, with optional filtering and sorting. */
   releases: ReleaseConnection;
   /**
    * [Deprecated] Returns a single roadmap by its identifier. Use initiatives instead.
@@ -19083,7 +19083,7 @@ export type RelationExistsComparator = {
   neq?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
-/** [Internal] A release that bundles issues together for a software deployment or version. Releases belong to a release pipeline and progress through stages (e.g., planned, started, completed, canceled). Issues are associated with releases via the IssueToRelease join entity, and the release tracks lifecycle timestamps such as when it was started, completed, or canceled. */
+/** A release that bundles issues together for a software deployment or version. Releases belong to a release pipeline and progress through stages (e.g., planned, started, completed, canceled). Issues are associated with releases via the IssueToRelease join entity, and the release tracks lifecycle timestamps such as when it was started, completed, or canceled. */
 export type Release = Node & {
   __typename?: 'Release';
   /** The time at which the entity was archived. Null if the entity has not been archived. */
@@ -19098,29 +19098,29 @@ export type Release = Node & {
   createdAt: Scalars['DateTime']['output'];
   /** The user who created the release. Null if the release was created by a non-user context such as an access key or automation. */
   creator?: Maybe<User>;
-  /** [Internal] The current progress summary for the release, including counts of issues by workflow state type (e.g., completed, in progress, unstarted). */
+  /** The current progress summary for the release, including counts of issues by workflow state type (e.g., completed, in progress, unstarted). */
   currentProgress: Scalars['JSONObject']['output'];
   /** The description of the release in plain text or markdown. Null if no description has been set. */
   description?: Maybe<Scalars['String']['output']>;
-  /** [Internal] Documents associated with the release. */
+  /** Documents associated with the release. */
   documents: DocumentConnection;
-  /** [Internal] History entries associated with the release. */
+  /** History entries associated with the release. */
   history: ReleaseHistoryConnection;
   /** The unique identifier of the entity. */
   id: Scalars['ID']['output'];
-  /** [ALPHA] Number of issues associated with the release. */
+  /** Number of issues associated with the release. */
   issueCount: Scalars['Int']['output'];
-  /** [ALPHA] Issues associated with the release. */
+  /** Issues associated with the release. */
   issues: IssueConnection;
-  /** [Internal] Links associated with the release. */
+  /** Links associated with the release. */
   links: EntityExternalLinkConnection;
   /** The name of the release. */
   name: Scalars['String']['output'];
   /** The release pipeline that this release belongs to. A release always belongs to exactly one pipeline. */
   pipeline: ReleasePipeline;
-  /** [Internal] The historical progress snapshots for the release, tracking how issue completion has evolved over time. */
+  /** The historical progress snapshots for the release, tracking how issue completion has evolved over time. */
   progressHistory: Scalars['JSONObject']['output'];
-  /** [ALPHA] Release notes for the release. */
+  /** Release notes for the release. */
   releaseNotes: Array<ReleaseNote>;
   /** The release's unique URL slug, used to construct human-readable URLs for the release. */
   slugId: Scalars['String']['output'];
@@ -19146,7 +19146,7 @@ export type Release = Node & {
 };
 
 
-/** [Internal] A release that bundles issues together for a software deployment or version. Releases belong to a release pipeline and progress through stages (e.g., planned, started, completed, canceled). Issues are associated with releases via the IssueToRelease join entity, and the release tracks lifecycle timestamps such as when it was started, completed, or canceled. */
+/** A release that bundles issues together for a software deployment or version. Releases belong to a release pipeline and progress through stages (e.g., planned, started, completed, canceled). Issues are associated with releases via the IssueToRelease join entity, and the release tracks lifecycle timestamps such as when it was started, completed, or canceled. */
 export type ReleaseDocumentsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -19158,7 +19158,7 @@ export type ReleaseDocumentsArgs = {
 };
 
 
-/** [Internal] A release that bundles issues together for a software deployment or version. Releases belong to a release pipeline and progress through stages (e.g., planned, started, completed, canceled). Issues are associated with releases via the IssueToRelease join entity, and the release tracks lifecycle timestamps such as when it was started, completed, or canceled. */
+/** A release that bundles issues together for a software deployment or version. Releases belong to a release pipeline and progress through stages (e.g., planned, started, completed, canceled). Issues are associated with releases via the IssueToRelease join entity, and the release tracks lifecycle timestamps such as when it was started, completed, or canceled. */
 export type ReleaseHistoryArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -19169,13 +19169,13 @@ export type ReleaseHistoryArgs = {
 };
 
 
-/** [Internal] A release that bundles issues together for a software deployment or version. Releases belong to a release pipeline and progress through stages (e.g., planned, started, completed, canceled). Issues are associated with releases via the IssueToRelease join entity, and the release tracks lifecycle timestamps such as when it was started, completed, or canceled. */
+/** A release that bundles issues together for a software deployment or version. Releases belong to a release pipeline and progress through stages (e.g., planned, started, completed, canceled). Issues are associated with releases via the IssueToRelease join entity, and the release tracks lifecycle timestamps such as when it was started, completed, or canceled. */
 export type ReleaseIssueCountArgs = {
   includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
-/** [Internal] A release that bundles issues together for a software deployment or version. Releases belong to a release pipeline and progress through stages (e.g., planned, started, completed, canceled). Issues are associated with releases via the IssueToRelease join entity, and the release tracks lifecycle timestamps such as when it was started, completed, or canceled. */
+/** A release that bundles issues together for a software deployment or version. Releases belong to a release pipeline and progress through stages (e.g., planned, started, completed, canceled). Issues are associated with releases via the IssueToRelease join entity, and the release tracks lifecycle timestamps such as when it was started, completed, or canceled. */
 export type ReleaseIssuesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -19187,7 +19187,7 @@ export type ReleaseIssuesArgs = {
 };
 
 
-/** [Internal] A release that bundles issues together for a software deployment or version. Releases belong to a release pipeline and progress through stages (e.g., planned, started, completed, canceled). Issues are associated with releases via the IssueToRelease join entity, and the release tracks lifecycle timestamps such as when it was started, completed, or canceled. */
+/** A release that bundles issues together for a software deployment or version. Releases belong to a release pipeline and progress through stages (e.g., planned, started, completed, canceled). Issues are associated with releases via the IssueToRelease join entity, and the release tracks lifecycle timestamps such as when it was started, completed, or canceled. */
 export type ReleaseLinksArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -19218,7 +19218,7 @@ export enum ReleaseChannel {
   Public = 'public'
 }
 
-/** [ALPHA] Release collection filtering options. */
+/** Release collection filtering options. */
 export type ReleaseCollectionFilter = {
   /** Compound filters, all of which need to be matched by the release. */
   and?: InputMaybe<Array<ReleaseCollectionFilter>>;
@@ -19277,6 +19277,10 @@ export type ReleaseConnection = {
 export type ReleaseCreateInput = {
   /** The commit SHA associated with this release. */
   commitSha?: InputMaybe<Scalars['String']['input']>;
+  /** The time at which the release was completed (e.g. if importing from another system). Must be a time in the past and after createdAt. Cannot be provided with an incompatible stage. */
+  completedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  /** The time at which the release was created (e.g. if importing from another system). Must be a time in the past. If none is provided, the backend will generate the time as now. */
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   /** The description of the release. */
   description?: InputMaybe<Scalars['String']['input']>;
   /** The identifier in UUID v4 format. If none is provided, the backend will generate one. */
@@ -19289,6 +19293,8 @@ export type ReleaseCreateInput = {
   stageId?: InputMaybe<Scalars['String']['input']>;
   /** The estimated start date of the release. */
   startDate?: InputMaybe<Scalars['TimelessDate']['input']>;
+  /** The time at which the release was started (e.g. if importing from another system). Must be a time in the past and after createdAt. */
+  startedAt?: InputMaybe<Scalars['DateTime']['input']>;
   /** The estimated completion date of the release. */
   targetDate?: InputMaybe<Scalars['TimelessDate']['input']>;
   /** The version of the release. */
@@ -19316,7 +19322,7 @@ export type ReleaseEdge = {
   node: Release;
 };
 
-/** [ALPHA] Release filtering options. */
+/** Release filtering options. */
 export type ReleaseFilter = {
   /** Compound filters, all of which need to be matched by the release. */
   and?: InputMaybe<Array<ReleaseFilter>>;
@@ -19340,7 +19346,7 @@ export type ReleaseFilter = {
   version?: InputMaybe<StringComparator>;
 };
 
-/** [Internal] A release history record containing a batch of chronologically ordered change events for a release. Each record holds up to 30 entries, and new records are created once the current record is full and a time window has elapsed. Tracks changes to name, description, version, stage, dates, pipeline, and archive status. */
+/** A release history record containing a batch of chronologically ordered change events for a release. Each record holds up to 30 entries, and new records are created once the current record is full and a time window has elapsed. Tracks changes to name, description, version, stage, dates, pipeline, and archive status. */
 export type ReleaseHistory = Node & {
   __typename?: 'ReleaseHistory';
   /** The time at which the entity was archived. Null if the entity has not been archived. */
@@ -19374,24 +19380,24 @@ export type ReleaseHistoryEdge = {
   node: ReleaseHistory;
 };
 
-/** [Internal] A release note. The note body is stored in related document content, and the releases it covers are tracked in releaseIds. */
+/** A release note. The note body is stored in related document content, and the releases it covers are tracked in releaseIds. */
 export type ReleaseNote = Node & {
   __typename?: 'ReleaseNote';
   /** The time at which the entity was archived. Null if the entity has not been archived. */
   archivedAt?: Maybe<Scalars['DateTime']['output']>;
   /** The time at which the entity was created. */
   createdAt: Scalars['DateTime']['output'];
-  /** [Internal] Document content backing the release note body. */
+  /** Document content backing the release note body. */
   documentContent?: Maybe<DocumentContent>;
   /** The unique identifier of the entity. */
   id: Scalars['ID']['output'];
   /** The most recent release covered by this note. */
   lastRelease?: Maybe<Release>;
-  /** [ALPHA] Releases included in the note. */
+  /** Releases included in the note. */
   releases: Array<Release>;
   /** The release note's unique URL slug, used to construct human-readable URLs for the note. */
   slugId: Scalars['String']['output'];
-  /** [ALPHA] User-supplied title for the release note. */
+  /** User-supplied title for the release note. */
   title?: Maybe<Scalars['String']['output']>;
   /**
    * The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
@@ -19407,7 +19413,7 @@ export type ReleaseNoteConnection = {
   pageInfo: PageInfo;
 };
 
-/** [ALPHA] Input for creating a release note. */
+/** Input for creating a release note. */
 export type ReleaseNoteCreateInput = {
   /** The release note body as markdown. */
   content?: InputMaybe<Scalars['String']['input']>;
@@ -19432,7 +19438,7 @@ export type ReleaseNoteEdge = {
   node: ReleaseNote;
 };
 
-/** [ALPHA] The result of a release note mutation. */
+/** The result of a release note mutation. */
 export type ReleaseNotePayload = {
   __typename?: 'ReleaseNotePayload';
   /** The identifier of the last sync operation. */
@@ -19443,7 +19449,7 @@ export type ReleaseNotePayload = {
   success: Scalars['Boolean']['output'];
 };
 
-/** [ALPHA] Input for updating a release note. */
+/** Input for updating a release note. */
 export type ReleaseNoteUpdateInput = {
   /** The release note body as markdown. */
   content?: InputMaybe<Scalars['String']['input']>;
@@ -19468,10 +19474,10 @@ export type ReleasePayload = {
   success: Scalars['Boolean']['output'];
 };
 
-/** [Internal] A release pipeline that defines a release workflow with ordered stages. Pipelines can be continuous (each sync creates a completed release) or scheduled (issues accumulate in a started release that is explicitly completed). Pipelines are associated with teams and can filter commits by file path patterns. */
+/** A release pipeline that defines a release workflow with ordered stages. Pipelines can be continuous (each sync creates a completed release) or scheduled (issues accumulate in a started release that is explicitly completed). Pipelines are associated with teams and can filter commits by file path patterns. */
 export type ReleasePipeline = Node & {
   __typename?: 'ReleasePipeline';
-  /** [ALPHA] The approximate number of non-archived releases in this pipeline. This is a denormalized count that is updated when releases are created or archived, and may not reflect the exact count at all times. */
+  /** The approximate number of non-archived releases in this pipeline. This is a denormalized count that is updated when releases are created or archived, and may not reflect the exact count at all times. */
   approximateReleaseCount: Scalars['Int']['output'];
   /** The time at which the entity was archived. Null if the entity has not been archived. */
   archivedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -19481,21 +19487,21 @@ export type ReleasePipeline = Node & {
   id: Scalars['ID']['output'];
   /** Glob patterns to filter commits by file path. When non-empty, only commits that modify files matching at least one pattern will be included in release syncs. An empty array means all commits are included regardless of file paths. */
   includePathPatterns: Array<Scalars['String']['output']>;
-  /** [ALPHA] Whether this pipeline targets a production environment. Defaults to true. Used to distinguish production pipelines from staging or development pipelines. */
+  /** Whether this pipeline targets a production environment. Defaults to true. Used to distinguish production pipelines from staging or development pipelines. */
   isProduction: Scalars['Boolean']['output'];
   /** The release note in this pipeline whose covered range ends with the most recent release. */
   latestReleaseNote?: Maybe<ReleaseNote>;
   /** The name of the pipeline. */
   name: Scalars['String']['output'];
-  /** [Internal] The document template used to define the release notes format for this pipeline. AI-generated release notes follow the structure and tone of this template. Null if no template has been configured. */
+  /** The document template used to define the release notes format for this pipeline. AI-generated release notes follow the structure and tone of this template. Null if no template has been configured. */
   releaseNoteTemplate?: Maybe<Template>;
-  /** [ALPHA] Releases associated with this pipeline. */
+  /** Releases associated with this pipeline. */
   releases: ReleaseConnection;
   /** The pipeline's unique slug identifier, used in URLs and for lookup by human-readable identifier instead of UUID. */
   slugId: Scalars['String']['output'];
-  /** [ALPHA] Stages associated with this pipeline. */
+  /** Stages associated with this pipeline. */
   stages: ReleaseStageConnection;
-  /** [ALPHA] Teams associated with this pipeline. */
+  /** Teams associated with this pipeline. */
   teams: TeamConnection;
   /** The type of the pipeline, which determines how releases are created and managed. Continuous pipelines create a completed release per sync, while scheduled pipelines accumulate issues in a started release. */
   type: ReleasePipelineType;
@@ -19504,12 +19510,12 @@ export type ReleasePipeline = Node & {
    *     been updated after creation.
    */
   updatedAt: Scalars['DateTime']['output'];
-  /** [Internal] The URL to the release pipeline's releases list in the Linear app. */
+  /** The URL to the release pipeline's releases list in the Linear app. */
   url: Scalars['String']['output'];
 };
 
 
-/** [Internal] A release pipeline that defines a release workflow with ordered stages. Pipelines can be continuous (each sync creates a completed release) or scheduled (issues accumulate in a started release that is explicitly completed). Pipelines are associated with teams and can filter commits by file path patterns. */
+/** A release pipeline that defines a release workflow with ordered stages. Pipelines can be continuous (each sync creates a completed release) or scheduled (issues accumulate in a started release that is explicitly completed). Pipelines are associated with teams and can filter commits by file path patterns. */
 export type ReleasePipelineReleasesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -19521,7 +19527,7 @@ export type ReleasePipelineReleasesArgs = {
 };
 
 
-/** [Internal] A release pipeline that defines a release workflow with ordered stages. Pipelines can be continuous (each sync creates a completed release) or scheduled (issues accumulate in a started release that is explicitly completed). Pipelines are associated with teams and can filter commits by file path patterns. */
+/** A release pipeline that defines a release workflow with ordered stages. Pipelines can be continuous (each sync creates a completed release) or scheduled (issues accumulate in a started release that is explicitly completed). Pipelines are associated with teams and can filter commits by file path patterns. */
 export type ReleasePipelineStagesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -19532,7 +19538,7 @@ export type ReleasePipelineStagesArgs = {
 };
 
 
-/** [Internal] A release pipeline that defines a release workflow with ordered stages. Pipelines can be continuous (each sync creates a completed release) or scheduled (issues accumulate in a started release that is explicitly completed). Pipelines are associated with teams and can filter commits by file path patterns. */
+/** A release pipeline that defines a release workflow with ordered stages. Pipelines can be continuous (each sync creates a completed release) or scheduled (issues accumulate in a started release that is explicitly completed). Pipelines are associated with teams and can filter commits by file path patterns. */
 export type ReleasePipelineTeamsArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -19553,7 +19559,7 @@ export type ReleasePipelineArchivePayload = ArchivePayload & {
   success: Scalars['Boolean']['output'];
 };
 
-/** [ALPHA] Release pipeline collection filtering options. */
+/** Release pipeline collection filtering options. */
 export type ReleasePipelineCollectionFilter = {
   /** Compound filters, all of which need to be matched by the release pipeline. */
   and?: InputMaybe<Array<ReleasePipelineCollectionFilter>>;
@@ -19611,7 +19617,7 @@ export type ReleasePipelineEdge = {
   node: ReleasePipeline;
 };
 
-/** [ALPHA] Release pipeline filtering options. */
+/** Release pipeline filtering options. */
 export type ReleasePipelineFilter = {
   /** Compound filters, all of which need to be matched by the pipeline. */
   and?: InputMaybe<Array<ReleasePipelineFilter>>;
@@ -19678,7 +19684,7 @@ export type ReleasePipelineUpdateInput = {
   type?: InputMaybe<ReleasePipelineType>;
 };
 
-/** [Internal] Issue release sorting options. */
+/** Issue release sorting options. */
 export type ReleaseSort = {
   /** Whether nulls should be sorted first or last */
   nulls?: InputMaybe<PaginationNulls>;
@@ -19692,7 +19698,7 @@ export type ReleaseSortInput = {
   stage?: InputMaybe<ReleaseStageSort>;
 };
 
-/** [Internal] A stage within a release pipeline that represents a phase in the release lifecycle (e.g., Planned, In Progress, Completed, Canceled). Releases progress through stages as they move toward production. Started-type stages can be frozen to prevent new issues from being automatically synced into releases at that stage. */
+/** A stage within a release pipeline that represents a phase in the release lifecycle (e.g., Planned, In Progress, Completed, Canceled). Releases progress through stages as they move toward production. Started-type stages can be frozen to prevent new issues from being automatically synced into releases at that stage. */
 export type ReleaseStage = Node & {
   __typename?: 'ReleaseStage';
   /** The time at which the entity was archived. Null if the entity has not been archived. */
@@ -19711,7 +19717,7 @@ export type ReleaseStage = Node & {
   pipeline: ReleasePipeline;
   /** The position of the stage within its pipeline, used for ordering stages in the UI. Lower values appear first. */
   position: Scalars['Float']['output'];
-  /** [ALPHA] Releases associated with this stage. */
+  /** Releases associated with this stage. */
   releases: ReleaseConnection;
   /** The lifecycle type of the stage (planned, started, completed, or canceled). The type determines what lifecycle timestamps are set on a release when it enters this stage. */
   type: ReleaseStageType;
@@ -19723,7 +19729,7 @@ export type ReleaseStage = Node & {
 };
 
 
-/** [Internal] A stage within a release pipeline that represents a phase in the release lifecycle (e.g., Planned, In Progress, Completed, Canceled). Releases progress through stages as they move toward production. Started-type stages can be frozen to prevent new issues from being automatically synced into releases at that stage. */
+/** A stage within a release pipeline that represents a phase in the release lifecycle (e.g., Planned, In Progress, Completed, Canceled). Releases progress through stages as they move toward production. Started-type stages can be frozen to prevent new issues from being automatically synced into releases at that stage. */
 export type ReleaseStageReleasesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
@@ -19776,7 +19782,7 @@ export type ReleaseStageEdge = {
   node: ReleaseStage;
 };
 
-/** [ALPHA] Release stage filtering options. */
+/** Release stage filtering options. */
 export type ReleaseStageFilter = {
   /** Compound filters, all of which need to be matched by the stage. */
   and?: InputMaybe<Array<ReleaseStageFilter>>;
@@ -19821,7 +19827,7 @@ export enum ReleaseStageType {
   Started = 'started'
 }
 
-/** [ALPHA] Comparator for release stage type. */
+/** Comparator for release stage type. */
 export type ReleaseStageTypeComparator = {
   /** Equals constraint. */
   eq?: InputMaybe<ReleaseStageType>;
@@ -19911,6 +19917,8 @@ export type ReleaseUpdateByPipelineInputBase = {
 export type ReleaseUpdateInput = {
   /** The commit SHA associated with this release. */
   commitSha?: InputMaybe<Scalars['String']['input']>;
+  /** The time at which the release was completed. */
+  completedAt?: InputMaybe<Scalars['DateTime']['input']>;
   /** The description of the release. */
   description?: InputMaybe<Scalars['String']['input']>;
   /** The name of the release. */
@@ -19921,6 +19929,8 @@ export type ReleaseUpdateInput = {
   stageId?: InputMaybe<Scalars['String']['input']>;
   /** The estimated start date of the release. */
   startDate?: InputMaybe<Scalars['TimelessDate']['input']>;
+  /** The time at which the release was started. */
+  startedAt?: InputMaybe<Scalars['DateTime']['input']>;
   /** The estimated completion date of the release. */
   targetDate?: InputMaybe<Scalars['TimelessDate']['input']>;
   /** Whether the release has been trashed. */
@@ -21143,7 +21153,7 @@ export type Team = Node & {
   progressHistory: Scalars['JSONObject']['output'];
   /** Projects associated with the team. */
   projects: ProjectConnection;
-  /** [ALPHA] Release pipelines associated with the team. */
+  /** Release pipelines associated with the team. */
   releasePipelines: ReleasePipelineConnection;
   /** Whether an issue needs to have a priority set before leaving triage. */
   requirePriorityToLeaveTriage: Scalars['Boolean']['output'];
@@ -21506,7 +21516,7 @@ export type TeamFilter = {
   parent?: InputMaybe<NullableTeamFilter>;
   /** Comparator for the team privacy. */
   private?: InputMaybe<BooleanComparator>;
-  /** [ALPHA] Filters that the team's release pipelines must satisfy. */
+  /** Filters that the team's release pipelines must satisfy. */
   releasePipelines?: InputMaybe<ReleasePipelineCollectionFilter>;
   /** Comparator for the time at which the team was retired. */
   retiredAt?: InputMaybe<NullableDateComparator>;
@@ -21811,7 +21821,7 @@ export type Template = Node & {
   name: Scalars['String']['output'];
   /** The workspace that owns this template. */
   organization: Organization;
-  /** [Internal] The release pipeline this template is bound to. Required when the template type is 'releaseNote' and forbidden otherwise. The pipeline owns at most one release note template, which defines the format AI follows when generating release notes. */
+  /** The release pipeline this template is bound to. Required when the template type is 'releaseNote' and forbidden otherwise. The pipeline owns at most one release note template, which defines the format AI follows when generating release notes. */
   pipeline?: Maybe<ReleasePipeline>;
   /** The sort order of the template within the templates list. */
   sortOrder: Scalars['Float']['output'];
@@ -23859,7 +23869,8 @@ export enum WorkflowTrigger {
 export enum WorkflowTriggerType {
   Issue = 'issue',
   Project = 'project',
-  Release = 'release'
+  Release = 'release',
+  Schedule = 'schedule'
 }
 
 export enum WorkflowType {

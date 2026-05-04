@@ -1,10 +1,10 @@
 import { createContext } from "../common/context.js";
 import { invalidParameterError } from "../common/errors.js";
 import { handleCommand, outputSuccess, parseLimit } from "../common/output.js";
+import { resolveScopedTeamId } from "../common/team-scope.js";
 import { formatDomainUsage } from "../common/usage.js";
 import { resolveProjectId, resolveProjectLabelIds, } from "../resolvers/project-resolver.js";
 import { resolveProjectStatusId } from "../resolvers/project-status-resolver.js";
-import { resolveScopedTeamId } from "../common/team-scope.js";
 import { resolveTeamId } from "../resolvers/team-resolver.js";
 import { resolveUserId } from "../resolvers/user-resolver.js";
 import { createProject, getProject, listProjects, updateProject, } from "../services/project-service.js";

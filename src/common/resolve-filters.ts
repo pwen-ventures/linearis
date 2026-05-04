@@ -87,10 +87,7 @@ export async function resolveFilterOptions(
     validateEstimate(parsedEstimate);
   }
 
-  // 2. Dependency validation
-  validateFilterDependencies(opts);
-
-  // 3. Date range validation
+  // 2. Date range validation
   validateDateRange(opts.dueAfter, opts.dueBefore, "due date");
   validateDateRange(opts.createdAfter, opts.createdBefore, "created date");
   validateDateRange(
@@ -100,13 +97,18 @@ export async function resolveFilterOptions(
   );
   validateDateRange(opts.updatedAfter, opts.updatedBefore, "updated date");
 
-  // 4. ID resolution
+  // 3. ID resolution. Team is resolved first so its presence (whether from the
+  // --team flag or the profile's defaultTeamId) can satisfy the dependency
+  // checks for --status / --cycle.
   const resolved: IssueFilterOptions = {};
 
   const scopedTeamId = await resolveScopedTeamId(ctx, opts.team);
   if (scopedTeamId) {
     resolved.teamId = scopedTeamId;
   }
+
+  // 4. Dependency validation (after team resolution).
+  validateFilterDependencies(opts, { hasTeam: Boolean(scopedTeamId) });
   if (opts.assignee) {
     resolved.assigneeId = await resolveUserId(ctx.sdk, opts.assignee);
   }

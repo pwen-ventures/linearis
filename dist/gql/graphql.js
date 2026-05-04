@@ -810,6 +810,7 @@ export var WorkflowTriggerType;
     WorkflowTriggerType["Issue"] = "issue";
     WorkflowTriggerType["Project"] = "project";
     WorkflowTriggerType["Release"] = "release";
+    WorkflowTriggerType["Schedule"] = "schedule";
 })(WorkflowTriggerType || (WorkflowTriggerType = {}));
 export var WorkflowType;
 (function (WorkflowType) {

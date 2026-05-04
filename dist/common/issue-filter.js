@@ -15,11 +15,11 @@ export function validateDateRange(after, before, label) {
         throw invalidParameterError(label, `range is contradictory: after (${after}) must be before (${before})`);
     }
 }
-export function validateFilterDependencies(flags) {
-    if (flags.status && !isUuid(flags.status) && !flags.team) {
+export function validateFilterDependencies(flags, context) {
+    if (flags.status && !isUuid(flags.status) && !context.hasTeam) {
         throw requiresParameterError("--status", "--team");
     }
-    if (flags.cycle && !isUuid(flags.cycle) && !flags.team) {
+    if (flags.cycle && !isUuid(flags.cycle) && !context.hasTeam) {
         throw requiresParameterError("--cycle", "--team");
     }
     if (flags.milestone && !isUuid(flags.milestone) && !flags.project) {

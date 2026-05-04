@@ -1,9 +1,9 @@
 import { createContext } from "../common/context.js";
 import { invalidParameterError, notFoundError, requiresParameterError, } from "../common/errors.js";
 import { handleCommand, outputSuccess, parseLimit } from "../common/output.js";
+import { resolveScopedTeamId } from "../common/team-scope.js";
 import { formatDomainUsage } from "../common/usage.js";
 import { resolveCycleId } from "../resolvers/cycle-resolver.js";
-import { resolveScopedTeamId } from "../common/team-scope.js";
 import { getCycle, listCycles } from "../services/cycle-service.js";
 export const CYCLES_META = {
     name: "cycles",
@@ -30,14 +30,14 @@ export function setupCyclesCommands(program) {
         .option("--after <cursor>", "cursor for next page")
         .action(handleCommand(async (...args) => {
         const [options, command] = args;
-        if (options.window && !options.team) {
-            throw requiresParameterError("--window", "--team");
-        }
         if (options.window && options.after) {
             throw invalidParameterError("--after", "cannot be used with --window");
         }
         const ctx = createContext(command.parent.parent.opts());
         const teamId = await resolveScopedTeamId(ctx, options.team);
+        if (options.window && !teamId) {
+            throw requiresParameterError("--window", "--team");
+        }
         const result = await listCycles(ctx.gql, teamId, options.active || false, { limit: parseLimit(options.limit), after: options.after });
         if (options.window) {
             const n = parseInt(options.window, 10);

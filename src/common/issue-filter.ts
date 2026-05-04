@@ -78,15 +78,13 @@ export function validateDateRange(
 }
 
 export function validateFilterDependencies(
-  flags: Pick<
-    RawFilterFlags,
-    "status" | "cycle" | "milestone" | "team" | "project"
-  >,
+  flags: Pick<RawFilterFlags, "status" | "cycle" | "milestone" | "project">,
+  context: { hasTeam: boolean },
 ): void {
-  if (flags.status && !isUuid(flags.status) && !flags.team) {
+  if (flags.status && !isUuid(flags.status) && !context.hasTeam) {
     throw requiresParameterError("--status", "--team");
   }
-  if (flags.cycle && !isUuid(flags.cycle) && !flags.team) {
+  if (flags.cycle && !isUuid(flags.cycle) && !context.hasTeam) {
     throw requiresParameterError("--cycle", "--team");
   }
   if (flags.milestone && !isUuid(flags.milestone) && !flags.project) {
