@@ -245,6 +245,22 @@ query GetIssueTeam($issueId: String!) {
   }
 }
 
+# Get the list of users subscribed to an issue.
+query GetIssueSubscribers($id: String!) {
+  issue(id: $id) {
+    id
+    identifier
+    subscribers {
+      nodes {
+        id
+        name
+        displayName
+        email
+      }
+    }
+  }
+}
+
 # Search issues with text search and all relationships in single query
 #
 # Provides full-text search across Linear issues with complete

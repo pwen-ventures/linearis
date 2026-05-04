@@ -39,6 +39,11 @@ import {
   searchIssues,
   updateIssue,
 } from "../services/issue-service.js";
+import {
+  listIssueSubscribers,
+  subscribeIssue,
+  unsubscribeIssue,
+} from "../services/subscriber-service.js";
 
 interface FilterOptions extends RawFilterFlags {
   limit: string;
@@ -116,6 +121,8 @@ export const ISSUES_META: DomainMeta = {
     "documents list --issue <issue>",
     "attachments list <issue>",
     "issues read --with-attachments",
+    "issues subscribe <issue>",
+    "issues subscribers <issue>",
   ],
 };
 
@@ -718,6 +725,85 @@ export function setupIssuesCommands(program: Command): void {
           await resolveAndApplyRelations(ctx, resolvedIssueId, relationActions);
         }
 
+        outputSuccess(result);
+      }),
+    );
+
+  issues
+    .command("subscribers <issue>")
+    .description("list users subscribed to an issue")
+    .addHelpText(
+      "after",
+      `\nWhen passing issue IDs, both UUID and identifiers like ABC-123 are supported.`,
+    )
+    .action(
+      handleCommand(async (...args: unknown[]) => {
+        const [issue, _options, command] = args as [
+          string,
+          Record<string, never>,
+          Command,
+        ];
+        const ctx = createContext(command.parent!.parent!.opts());
+        const issueId = await resolveIssueId(ctx.sdk, issue);
+        const result = await listIssueSubscribers(ctx.gql, issueId);
+        outputSuccess(result);
+      }),
+    );
+
+  issues
+    .command("subscribe <issue>")
+    .description("subscribe a user to an issue (defaults to current viewer)")
+    .option(
+      "--user <user>",
+      "user to subscribe (name, email, or UUID); defaults to viewer",
+    )
+    .addHelpText(
+      "after",
+      `\nWhen passing issue IDs, both UUID and identifiers like ABC-123 are supported.`,
+    )
+    .action(
+      handleCommand(async (...args: unknown[]) => {
+        const [issue, options, command] = args as [
+          string,
+          { user?: string },
+          Command,
+        ];
+        const ctx = createContext(command.parent!.parent!.opts());
+        const issueId = await resolveIssueId(ctx.sdk, issue);
+        const userId = options.user
+          ? await resolveUserId(ctx.sdk, options.user)
+          : undefined;
+        const result = await subscribeIssue(ctx.gql, issueId, { userId });
+        outputSuccess(result);
+      }),
+    );
+
+  issues
+    .command("unsubscribe <issue>")
+    .description(
+      "unsubscribe a user from an issue (defaults to current viewer)",
+    )
+    .option(
+      "--user <user>",
+      "user to unsubscribe (name, email, or UUID); defaults to viewer",
+    )
+    .addHelpText(
+      "after",
+      `\nWhen passing issue IDs, both UUID and identifiers like ABC-123 are supported.`,
+    )
+    .action(
+      handleCommand(async (...args: unknown[]) => {
+        const [issue, options, command] = args as [
+          string,
+          { user?: string },
+          Command,
+        ];
+        const ctx = createContext(command.parent!.parent!.opts());
+        const issueId = await resolveIssueId(ctx.sdk, issue);
+        const userId = options.user
+          ? await resolveUserId(ctx.sdk, options.user)
+          : undefined;
+        const result = await unsubscribeIssue(ctx.gql, issueId, { userId });
         outputSuccess(result);
       }),
     );

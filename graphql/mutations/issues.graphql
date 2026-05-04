@@ -32,3 +32,43 @@ mutation UpdateIssue($id: String!, $input: IssueUpdateInput!) {
     }
   }
 }
+
+# Subscribe a user to an issue. Defaults to the current viewer when
+# neither userId nor userEmail is supplied.
+mutation IssueSubscribe($id: String!, $userId: String, $userEmail: String) {
+  issueSubscribe(id: $id, userId: $userId, userEmail: $userEmail) {
+    success
+    issue {
+      id
+      identifier
+      subscribers {
+        nodes {
+          id
+          name
+          displayName
+          email
+        }
+      }
+    }
+  }
+}
+
+# Unsubscribe a user from an issue. Defaults to the current viewer when
+# neither userId nor userEmail is supplied.
+mutation IssueUnsubscribe($id: String!, $userId: String, $userEmail: String) {
+  issueUnsubscribe(id: $id, userId: $userId, userEmail: $userEmail) {
+    success
+    issue {
+      id
+      identifier
+      subscribers {
+        nodes {
+          id
+          name
+          displayName
+          email
+        }
+      }
+    }
+  }
+}

@@ -15,6 +15,7 @@ import { resolveUserId } from "../resolvers/user-resolver.js";
 import { buildIssueFilter } from "../services/issue-filter.js";
 import { createIssueRelation, deleteIssueRelation, findIssueRelation, } from "../services/issue-relation-service.js";
 import { createIssue, getIssue, getIssueByIdentifier, getIssueByIdentifierWithAttachments, getIssueWithAttachments, listIssues, searchIssues, updateIssue, } from "../services/issue-service.js";
+import { listIssueSubscribers, subscribeIssue, unsubscribeIssue, } from "../services/subscriber-service.js";
 export const ISSUES_META = {
     name: "issues",
     summary: "work items with status, priority, assignee, labels",
@@ -39,6 +40,8 @@ export const ISSUES_META = {
         "documents list --issue <issue>",
         "attachments list <issue>",
         "issues read --with-attachments",
+        "issues subscribe <issue>",
+        "issues subscribers <issue>",
     ],
 };
 function parseRelationFlags(flags) {
@@ -446,6 +449,47 @@ export function setupIssuesCommands(program) {
         if (relationActions.length > 0) {
             await resolveAndApplyRelations(ctx, resolvedIssueId, relationActions);
         }
+        outputSuccess(result);
+    }));
+    issues
+        .command("subscribers <issue>")
+        .description("list users subscribed to an issue")
+        .addHelpText("after", `\nWhen passing issue IDs, both UUID and identifiers like ABC-123 are supported.`)
+        .action(handleCommand(async (...args) => {
+        const [issue, _options, command] = args;
+        const ctx = createContext(command.parent.parent.opts());
+        const issueId = await resolveIssueId(ctx.sdk, issue);
+        const result = await listIssueSubscribers(ctx.gql, issueId);
+        outputSuccess(result);
+    }));
+    issues
+        .command("subscribe <issue>")
+        .description("subscribe a user to an issue (defaults to current viewer)")
+        .option("--user <user>", "user to subscribe (name, email, or UUID); defaults to viewer")
+        .addHelpText("after", `\nWhen passing issue IDs, both UUID and identifiers like ABC-123 are supported.`)
+        .action(handleCommand(async (...args) => {
+        const [issue, options, command] = args;
+        const ctx = createContext(command.parent.parent.opts());
+        const issueId = await resolveIssueId(ctx.sdk, issue);
+        const userId = options.user
+            ? await resolveUserId(ctx.sdk, options.user)
+            : undefined;
+        const result = await subscribeIssue(ctx.gql, issueId, { userId });
+        outputSuccess(result);
+    }));
+    issues
+        .command("unsubscribe <issue>")
+        .description("unsubscribe a user from an issue (defaults to current viewer)")
+        .option("--user <user>", "user to unsubscribe (name, email, or UUID); defaults to viewer")
+        .addHelpText("after", `\nWhen passing issue IDs, both UUID and identifiers like ABC-123 are supported.`)
+        .action(handleCommand(async (...args) => {
+        const [issue, options, command] = args;
+        const ctx = createContext(command.parent.parent.opts());
+        const issueId = await resolveIssueId(ctx.sdk, issue);
+        const userId = options.user
+            ? await resolveUserId(ctx.sdk, options.user)
+            : undefined;
+        const result = await unsubscribeIssue(ctx.gql, issueId, { userId });
         outputSuccess(result);
     }));
     issues

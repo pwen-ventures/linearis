@@ -59,11 +59,14 @@ relationships and issue relations (blocks, blocked-by, relates-to,
 duplicate-of) are supported.
 
 commands:
-  list [options]  list issues with optional filters
-  search <query>  full-text search issues
-  read <issue>    get full issue details including description
-  create <title>  create new issue
-  update <issue>  update an existing issue
+  list [options]       list issues with optional filters
+  search <query>       full-text search issues
+  read <issue>         get full issue details including description
+  create <title>       create new issue
+  update <issue>       update an existing issue
+  subscribers <issue>  list users subscribed to an issue
+  subscribe <issue>    subscribe a user to an issue (defaults to current viewer)
+  unsubscribe <issue>  unsubscribe a user from an issue (defaults to current viewer)
 
 arguments:
   <issue>  issue identifier (UUID or ABC-123)
@@ -168,7 +171,13 @@ update options:
   --duplicate-of <issue>     add duplicate relation
   --remove-relation <issue>  remove relation with <issue>
 
-see also: comments create <issue>, documents list --issue <issue>, attachments list <issue>, issues read --with-attachments
+subscribe options:
+  --user <user>  user to subscribe (name, email, or UUID); defaults to viewer
+
+unsubscribe options:
+  --user <user>  user to unsubscribe (name, email, or UUID); defaults to viewer
+
+see also: comments create <issue>, documents list --issue <issue>, attachments list <issue>, issues read --with-attachments, issues subscribe <issue>, issues subscribers <issue>
 
 ---
 
