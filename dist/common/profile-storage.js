@@ -77,9 +77,7 @@ export function saveProfile(name, profile) {
         ...(profile.displayIconUrl
             ? { displayIconUrl: profile.displayIconUrl }
             : {}),
-        ...(profile.defaultTeamId
-            ? { defaultTeamId: profile.defaultTeamId }
-            : {}),
+        ...(profile.defaultTeamId ? { defaultTeamId: profile.defaultTeamId } : {}),
     };
     if (!data.defaultProfile) {
         data.defaultProfile = name;

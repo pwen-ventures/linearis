@@ -97,6 +97,7 @@ export function listProfiles(): {
     name: string;
     createAsUser?: string;
     displayIconUrl?: string;
+    defaultTeamId?: string;
   }>;
 } {
   const data = readProfilesFile();
