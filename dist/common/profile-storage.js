@@ -36,7 +36,15 @@ function readProfilesFile() {
         return emptyFile();
     }
     const raw = fs.readFileSync(filePath, "utf8");
-    const parsed = JSON.parse(raw);
+    let parsed;
+    try {
+        parsed = JSON.parse(raw);
+    }
+    catch (error) {
+        const reason = error instanceof Error ? error.message : String(error);
+        throw new Error(`Profiles file at ${filePath} is not valid JSON: ${reason}. ` +
+            `Edit the file by hand to fix the syntax, or delete it and run \`linearis auth login\` to recreate it.`);
+    }
     if (!parsed.profiles || typeof parsed.profiles !== "object") {
         return emptyFile();
     }
@@ -54,6 +62,7 @@ export function listProfiles() {
         name,
         ...(entry.createAsUser ? { createAsUser: entry.createAsUser } : {}),
         ...(entry.displayIconUrl ? { displayIconUrl: entry.displayIconUrl } : {}),
+        ...(entry.defaultTeamId ? { defaultTeamId: entry.defaultTeamId } : {}),
     }));
     return {
         defaultProfile: data.defaultProfile ?? null,
@@ -68,11 +77,29 @@ export function saveProfile(name, profile) {
         ...(profile.displayIconUrl
             ? { displayIconUrl: profile.displayIconUrl }
             : {}),
+        ...(profile.defaultTeamId
+            ? { defaultTeamId: profile.defaultTeamId }
+            : {}),
     };
     if (!data.defaultProfile) {
         data.defaultProfile = name;
     }
     writeProfilesFile(data);
+}
+export function setProfileDefaultTeamId(name, defaultTeamId) {
+    const data = readProfilesFile();
+    const entry = data.profiles[name];
+    if (!entry) {
+        return false;
+    }
+    if (defaultTeamId) {
+        entry.defaultTeamId = defaultTeamId;
+    }
+    else {
+        delete entry.defaultTeamId;
+    }
+    writeProfilesFile(data);
+    return true;
 }
 export function deleteProfile(name) {
     const data = readProfilesFile();
@@ -98,6 +125,7 @@ export function getProfile(name) {
         token: decryptToken(entry.token),
         ...(entry.createAsUser ? { createAsUser: entry.createAsUser } : {}),
         ...(entry.displayIconUrl ? { displayIconUrl: entry.displayIconUrl } : {}),
+        ...(entry.defaultTeamId ? { defaultTeamId: entry.defaultTeamId } : {}),
     };
 }
 export function getDefaultProfile() {

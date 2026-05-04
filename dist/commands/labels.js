@@ -27,7 +27,7 @@ export function setupLabelsCommands(program) {
         const ctx = createContext(command.parent.parent.opts());
         const teamId = options.team
             ? await resolveTeamId(ctx.sdk, options.team)
-            : undefined;
+            : ctx.defaultTeamId;
         const result = await listLabels(ctx.gql, teamId, {
             limit: parseLimit(options.limit),
             after: options.after,

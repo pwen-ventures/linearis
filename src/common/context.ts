@@ -14,6 +14,7 @@ export interface CommandContext {
   gql: GraphQLClient;
   sdk: LinearSdkClient;
   actorOverrides: ActorOverrides;
+  defaultTeamId?: string;
 }
 
 export function createContext(options: CommandOptions): CommandContext {
@@ -25,6 +26,9 @@ export function createContext(options: CommandOptions): CommandContext {
     gql: new GraphQLClient(resolved.token),
     sdk: new LinearSdkClient(resolved.token),
     actorOverrides,
+    ...(resolved.profile?.defaultTeamId
+      ? { defaultTeamId: resolved.profile.defaultTeamId }
+      : {}),
   };
 }
 

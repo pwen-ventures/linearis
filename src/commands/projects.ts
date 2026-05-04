@@ -21,6 +21,7 @@ import {
 interface ListOptions {
   limit: string;
   after?: string;
+  team?: string;
 }
 
 interface CreateOptions {
@@ -89,15 +90,20 @@ export function setupProjectsCommands(program: Command): void {
   projects
     .command("list")
     .description("list projects")
-    .option("-l, --limit <n>", "max results", "100")
+    .option("--team <team>", "filter by team (key, name, or UUID)")
+    .option("-l, --limit <n>", "max results", "50")
     .option("--after <cursor>", "cursor for next page")
     .action(
       handleCommand(async (...args: unknown[]) => {
         const [options, command] = args as [ListOptions, Command];
         const ctx = createContext(command.parent!.parent!.opts());
+        const teamId = options.team
+          ? await resolveTeamId(ctx.sdk, options.team)
+          : ctx.defaultTeamId;
         const result = await listProjects(ctx.gql, {
           limit: parseLimit(options.limit),
           after: options.after,
+          teamId,
         });
         outputSuccess(result);
       }),

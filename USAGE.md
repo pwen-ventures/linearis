@@ -32,15 +32,17 @@ env, LINEAR_API_TOKEN env, default profile, ~/.linearis/token (legacy),
 ~/.linear_api_token (deprecated).
 
 commands:
-  login [options]  set up or refresh authentication
-  logout           remove stored authentication token or profile
-  list             list configured profiles
-  config           open the profile config file in VS Code
+  login [options]               set up or refresh authentication
+  logout                        remove stored authentication token or profile
+  list                          list configured profiles
+  config                        open the profile config file in VS Code
+  set-default-team [team-uuid]  set or clear the default team UUID for a profile (used as fallback when --team is omitted)
 
 login options:
-  --force           reauthenticate even if already authenticated
-  --as <name>       display name for created issues/comments (profile only)
-  --icon-url <url>  avatar URL for created issues/comments (profile only)
+  --force                   reauthenticate even if already authenticated
+  --as <name>               display name for created issues/comments (profile only)
+  --icon-url <url>          avatar URL for created issues/comments (profile only)
+  --default-team-id <uuid>  team UUID applied automatically as the team filter when --team is omitted (profile only)
 
 ---
 
@@ -239,7 +241,8 @@ arguments:
   <name>     string
 
 list options:
-  --limit <n>       max results (default: 100)
+  --team <team>     filter by team (key, name, or UUID)
+  --limit <n>       max results (default: 50)
   --after <cursor>  cursor for next page
 
 create options:

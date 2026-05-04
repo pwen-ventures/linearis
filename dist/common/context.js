@@ -11,6 +11,9 @@ export function createContext(options) {
         gql: new GraphQLClient(resolved.token),
         sdk: new LinearSdkClient(resolved.token),
         actorOverrides,
+        ...(resolved.profile?.defaultTeamId
+            ? { defaultTeamId: resolved.profile.defaultTeamId }
+            : {}),
     };
 }
 export function createGraphQLClient(token) {

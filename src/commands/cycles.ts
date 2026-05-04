@@ -65,10 +65,11 @@ export function setupCyclesCommands(program: Command): void {
 
         const ctx = createContext(command.parent!.parent!.opts());
 
-        // Resolve team filter if provided
+        // Resolve team filter if provided, otherwise fall back to the
+        // profile's default team (when configured).
         const teamId = options.team
           ? await resolveTeamId(ctx.sdk, options.team)
-          : undefined;
+          : ctx.defaultTeamId;
 
         // Fetch cycles
         const result = await listCycles(

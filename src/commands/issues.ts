@@ -429,10 +429,14 @@ export function setupIssuesCommands(program: Command): void {
 
         const relationActions = parseRelationFlags(options);
 
-        if (!options.team) {
-          throw new Error("--team is required");
+        const teamId = options.team
+          ? await resolveTeamId(ctx.sdk, options.team)
+          : ctx.defaultTeamId;
+        if (!teamId) {
+          throw new Error(
+            "--team is required (or configure a defaultTeamId on the active profile)",
+          );
         }
-        const teamId = await resolveTeamId(ctx.sdk, options.team);
 
         const input: IssueCreateInput = {
           title,

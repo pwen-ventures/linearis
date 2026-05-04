@@ -19,6 +19,7 @@ import {
   listProfiles,
   profileExists,
   saveProfile,
+  setProfileDefaultTeamId,
 } from "../common/profile-storage.js";
 import { clearToken, saveToken } from "../common/token-storage.js";
 import type { Viewer } from "../common/types.js";
@@ -57,6 +58,7 @@ interface LoginOptions {
   force?: boolean;
   as?: string;
   iconUrl?: string;
+  defaultTeamId?: string;
 }
 
 function openBrowser(url: string): void {
@@ -154,6 +156,10 @@ export function setupAuthCommands(program: Command): void {
       "--icon-url <url>",
       "avatar URL for created issues/comments (profile only)",
     )
+    .option(
+      "--default-team-id <uuid>",
+      "team UUID applied automatically as the team filter when --team is omitted (profile only)",
+    )
     .action(async (options: LoginOptions, command: Command) => {
       const rootOpts = getRootOpts(command);
       const profileName = rootOpts.profile;
@@ -237,6 +243,7 @@ export function setupAuthCommands(program: Command): void {
             token,
             createAsUser: options.as,
             displayIconUrl: options.iconUrl,
+            defaultTeamId: options.defaultTeamId,
           });
           console.error("");
           console.error(
@@ -244,9 +251,9 @@ export function setupAuthCommands(program: Command): void {
           );
           console.error(`Stored in ${getProfilesPath()}`);
         } else {
-          if (options.as || options.iconUrl) {
+          if (options.as || options.iconUrl || options.defaultTeamId) {
             console.error(
-              "Warning: --as and --icon-url require -p/--profile; ignoring.",
+              "Warning: --as, --icon-url, and --default-team-id require -p/--profile; ignoring.",
             );
           }
           saveToken(token);
@@ -332,6 +339,44 @@ export function setupAuthCommands(program: Command): void {
           );
         }
         outputSuccess({ path: filePath, opened: true });
+      }),
+    );
+
+  auth
+    .command("set-default-team")
+    .description(
+      "set or clear the default team UUID for a profile (used as fallback when --team is omitted)",
+    )
+    .argument("[team-uuid]", "team UUID; omit to clear the default")
+    .action(
+      handleCommand(async (...args: unknown[]) => {
+        const [teamUuid, , command] = args as [
+          string | undefined,
+          unknown,
+          Command,
+        ];
+        const rootOpts = getRootOpts(command);
+        if (!rootOpts.profile) {
+          throw new Error(
+            "set-default-team requires -p/--profile to identify which profile to update",
+          );
+        }
+        const updated = setProfileDefaultTeamId(
+          rootOpts.profile,
+          teamUuid?.trim() || undefined,
+        );
+        if (!updated) {
+          throw new Error(
+            `Profile "${rootOpts.profile}" not found. Run 'linearis auth list' to see available profiles.`,
+          );
+        }
+        outputSuccess({
+          profile: rootOpts.profile,
+          defaultTeamId: teamUuid?.trim() || null,
+          message: teamUuid
+            ? `Default team UUID set on profile "${rootOpts.profile}".`
+            : `Default team UUID cleared on profile "${rootOpts.profile}".`,
+        });
       }),
     );
 

@@ -105,6 +105,8 @@ export async function resolveFilterOptions(
 
   if (opts.team) {
     resolved.teamId = await resolveTeamId(ctx.sdk, opts.team);
+  } else if (ctx.defaultTeamId) {
+    resolved.teamId = ctx.defaultTeamId;
   }
   if (opts.assignee) {
     resolved.assigneeId = await resolveUserId(ctx.sdk, opts.assignee);

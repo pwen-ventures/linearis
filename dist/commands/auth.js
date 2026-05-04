@@ -5,7 +5,7 @@ const execAsync = promisify(exec);
 import { resolveApiToken, } from "../common/auth.js";
 import { createGraphQLClient } from "../common/context.js";
 import { handleCommand, outputSuccess } from "../common/output.js";
-import { deleteProfile, ensureProfilesFile, getProfilesPath, listProfiles, profileExists, saveProfile, } from "../common/profile-storage.js";
+import { deleteProfile, ensureProfilesFile, getProfilesPath, listProfiles, profileExists, saveProfile, setProfileDefaultTeamId, } from "../common/profile-storage.js";
 import { clearToken, saveToken } from "../common/token-storage.js";
 import { formatDomainUsage } from "../common/usage.js";
 import { validateToken } from "../services/auth-service.js";
@@ -110,6 +110,7 @@ export function setupAuthCommands(program) {
         .option("--force", "reauthenticate even if already authenticated")
         .option("--as <name>", "display name for created issues/comments (profile only)")
         .option("--icon-url <url>", "avatar URL for created issues/comments (profile only)")
+        .option("--default-team-id <uuid>", "team UUID applied automatically as the team filter when --team is omitted (profile only)")
         .action(async (options, command) => {
         const rootOpts = getRootOpts(command);
         const profileName = rootOpts.profile;
@@ -172,14 +173,15 @@ export function setupAuthCommands(program) {
                     token,
                     createAsUser: options.as,
                     displayIconUrl: options.iconUrl,
+                    defaultTeamId: options.defaultTeamId,
                 });
                 console.error("");
                 console.error(`Profile "${profileName}" saved. Logged in as ${viewer.name} (${viewer.email}).`);
                 console.error(`Stored in ${getProfilesPath()}`);
             }
             else {
-                if (options.as || options.iconUrl) {
-                    console.error("Warning: --as and --icon-url require -p/--profile; ignoring.");
+                if (options.as || options.iconUrl || options.defaultTeamId) {
+                    console.error("Warning: --as, --icon-url, and --default-team-id require -p/--profile; ignoring.");
                 }
                 saveToken(token);
                 console.error("");
@@ -249,6 +251,28 @@ export function setupAuthCommands(program) {
             throw new Error(`Failed to open VS Code (path: ${filePath}): ${detail}`);
         }
         outputSuccess({ path: filePath, opened: true });
+    }));
+    auth
+        .command("set-default-team")
+        .description("set or clear the default team UUID for a profile (used as fallback when --team is omitted)")
+        .argument("[team-uuid]", "team UUID; omit to clear the default")
+        .action(handleCommand(async (...args) => {
+        const [teamUuid, , command] = args;
+        const rootOpts = getRootOpts(command);
+        if (!rootOpts.profile) {
+            throw new Error("set-default-team requires -p/--profile to identify which profile to update");
+        }
+        const updated = setProfileDefaultTeamId(rootOpts.profile, teamUuid?.trim() || undefined);
+        if (!updated) {
+            throw new Error(`Profile "${rootOpts.profile}" not found. Run 'linearis auth list' to see available profiles.`);
+        }
+        outputSuccess({
+            profile: rootOpts.profile,
+            defaultTeamId: teamUuid?.trim() || null,
+            message: teamUuid
+                ? `Default team UUID set on profile "${rootOpts.profile}".`
+                : `Default team UUID cleared on profile "${rootOpts.profile}".`,
+        });
     }));
     auth
         .command("usage")

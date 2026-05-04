@@ -39,7 +39,7 @@ export function setupCyclesCommands(program) {
         const ctx = createContext(command.parent.parent.opts());
         const teamId = options.team
             ? await resolveTeamId(ctx.sdk, options.team)
-            : undefined;
+            : ctx.defaultTeamId;
         const result = await listCycles(ctx.gql, teamId, options.active || false, { limit: parseLimit(options.limit), after: options.after });
         if (options.window) {
             const n = parseInt(options.window, 10);

@@ -11,6 +11,7 @@ export interface StoredProfile {
   token: string;
   createAsUser?: string;
   displayIconUrl?: string;
+  defaultTeamId?: string;
 }
 
 export interface ResolvedProfile {
@@ -18,12 +19,14 @@ export interface ResolvedProfile {
   token: string;
   createAsUser?: string;
   displayIconUrl?: string;
+  defaultTeamId?: string;
 }
 
 interface StoredProfileEntry {
   token: string;
   createAsUser?: string;
   displayIconUrl?: string;
+  defaultTeamId?: string;
 }
 
 interface ProfilesFile {
@@ -65,7 +68,16 @@ function readProfilesFile(): ProfilesFile {
     return emptyFile();
   }
   const raw = fs.readFileSync(filePath, "utf8");
-  const parsed = JSON.parse(raw) as ProfilesFile;
+  let parsed: ProfilesFile;
+  try {
+    parsed = JSON.parse(raw) as ProfilesFile;
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Profiles file at ${filePath} is not valid JSON: ${reason}. ` +
+        `Edit the file by hand to fix the syntax, or delete it and run \`linearis auth login\` to recreate it.`,
+    );
+  }
   if (!parsed.profiles || typeof parsed.profiles !== "object") {
     return emptyFile();
   }
@@ -92,6 +104,7 @@ export function listProfiles(): {
     name,
     ...(entry.createAsUser ? { createAsUser: entry.createAsUser } : {}),
     ...(entry.displayIconUrl ? { displayIconUrl: entry.displayIconUrl } : {}),
+    ...(entry.defaultTeamId ? { defaultTeamId: entry.defaultTeamId } : {}),
   }));
   return {
     defaultProfile: data.defaultProfile ?? null,
@@ -107,11 +120,36 @@ export function saveProfile(name: string, profile: StoredProfile): void {
     ...(profile.displayIconUrl
       ? { displayIconUrl: profile.displayIconUrl }
       : {}),
+    ...(profile.defaultTeamId ? { defaultTeamId: profile.defaultTeamId } : {}),
   };
   if (!data.defaultProfile) {
     data.defaultProfile = name;
   }
   writeProfilesFile(data);
+}
+
+/**
+ * Update an existing profile's `defaultTeamId` without re-entering the token.
+ * Pass `undefined` (or omit) to clear it.
+ *
+ * @returns `true` if the profile existed and was updated, `false` otherwise.
+ */
+export function setProfileDefaultTeamId(
+  name: string,
+  defaultTeamId: string | undefined,
+): boolean {
+  const data = readProfilesFile();
+  const entry = data.profiles[name];
+  if (!entry) {
+    return false;
+  }
+  if (defaultTeamId) {
+    entry.defaultTeamId = defaultTeamId;
+  } else {
+    delete entry.defaultTeamId;
+  }
+  writeProfilesFile(data);
+  return true;
 }
 
 export function deleteProfile(name: string): boolean {
@@ -139,6 +177,7 @@ export function getProfile(name: string): ResolvedProfile | null {
     token: decryptToken(entry.token),
     ...(entry.createAsUser ? { createAsUser: entry.createAsUser } : {}),
     ...(entry.displayIconUrl ? { displayIconUrl: entry.displayIconUrl } : {}),
+    ...(entry.defaultTeamId ? { defaultTeamId: entry.defaultTeamId } : {}),
   };
 }
 

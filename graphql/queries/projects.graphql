@@ -95,11 +95,17 @@ fragment ProjectDetailFields on Project {
 # Fetches a paginated list of projects across all teams with enriched
 # fields including status, priority, lead, teams, labels, health.
 #
+# An optional team filter scopes the result to projects accessible to a
+# specific team. Without it the query enumerates every project in the
+# workspace, which can exceed Linear's GraphQL complexity budget on busy
+# workspaces.
+#
 # Variables:
 #   $first: Maximum number of projects to return (default: 50)
 #   $after: Cursor for pagination
-query GetProjects($first: Int = 50, $after: String) {
-  projects(first: $first, after: $after) {
+#   $filter: Optional ProjectFilter — typically `{ accessibleTeams: { id: { eq: "<team-uuid>" } } }`
+query GetProjects($first: Int = 50, $after: String, $filter: ProjectFilter) {
+  projects(first: $first, after: $after, filter: $filter) {
     nodes {
       ...ProjectListFields
     }

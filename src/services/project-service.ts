@@ -15,19 +15,28 @@ import {
   GetProjectsDocument,
   type GetProjectsQuery,
   type ProjectCreateInput,
+  type ProjectFilter,
   type ProjectUpdateInput,
   UpdateProjectDocument,
   type UpdateProjectMutation,
 } from "../gql/graphql.js";
 
+export interface ListProjectsOptions extends PaginationOptions {
+  teamId?: string;
+}
+
 export async function listProjects(
   client: GraphQLClient,
-  options: PaginationOptions = {},
+  options: ListProjectsOptions = {},
 ): Promise<PaginatedResult<ProjectListItem>> {
-  const { limit = 50, after } = options;
+  const { limit = 50, after, teamId } = options;
+  const filter: ProjectFilter | undefined = teamId
+    ? { accessibleTeams: { id: { eq: teamId } } }
+    : undefined;
   const result = await client.request<GetProjectsQuery>(GetProjectsDocument, {
     first: limit,
     after,
+    filter,
   });
 
   return {

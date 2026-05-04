@@ -1,9 +1,13 @@
 import { CreateProjectDocument, GetProjectDocument, GetProjectsDocument, UpdateProjectDocument, } from "../gql/graphql.js";
 export async function listProjects(client, options = {}) {
-    const { limit = 50, after } = options;
+    const { limit = 50, after, teamId } = options;
+    const filter = teamId
+        ? { accessibleTeams: { id: { eq: teamId } } }
+        : undefined;
     const result = await client.request(GetProjectsDocument, {
         first: limit,
         after,
+        filter,
     });
     return {
         nodes: result.projects.nodes,

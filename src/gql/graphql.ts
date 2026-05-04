@@ -562,6 +562,8 @@ export type AiConversation = Node & {
   __typename?: 'AiConversation';
   /** The time at which the entity was archived. Null if the entity has not been archived. */
   archivedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** The client platform from which this conversation was initiated, such as web, desktop, or mobile. */
+  clientPlatform?: Maybe<AiConversationClientPlatform>;
   /** The entity contexts this conversation is related to, such as issues, projects, or documents that provide context for the AI assistant. */
   context: Scalars['JSONObject']['output'];
   /** The time at which the entity was created. */
@@ -623,6 +625,13 @@ export type AiConversationBaseWidget = {
   /** The arguments of the widget. */
   rawArgs?: Maybe<Scalars['JSON']['output']>;
 };
+
+/** The client platform from which an AI conversation was initiated. */
+export enum AiConversationClientPlatform {
+  Desktop = 'desktop',
+  Mobile = 'mobile',
+  Web = 'web'
+}
 
 export type AiConversationCodeIntelligenceToolCall = AiConversationBaseToolCall & {
   __typename?: 'AiConversationCodeIntelligenceToolCall';
@@ -723,6 +732,7 @@ export enum AiConversationEntityCardWidgetArgsType {
   Initiative = 'Initiative',
   InitiativeUpdate = 'InitiativeUpdate',
   Issue = 'Issue',
+  IssueDraft = 'IssueDraft',
   Project = 'Project',
   ProjectUpdate = 'ProjectUpdate',
   PullRequest = 'PullRequest',
@@ -784,6 +794,7 @@ export enum AiConversationEntityListWidgetArgsEntitiesType {
   Initiative = 'Initiative',
   InitiativeUpdate = 'InitiativeUpdate',
   Issue = 'Issue',
+  IssueDraft = 'IssueDraft',
   Project = 'Project',
   ProjectUpdate = 'ProjectUpdate',
   PullRequest = 'PullRequest',
@@ -794,6 +805,23 @@ export enum AiConversationEntityListWidgetArgsEntitiesType {
   WorkflowDefinition = 'WorkflowDefinition'
 }
 
+/** An event part in an AI conversation. */
+export type AiConversationEventPart = AiConversationBasePart & {
+  __typename?: 'AiConversationEventPart';
+  /** The Markdown body of the event part. */
+  body: Scalars['String']['output'];
+  /** The data of the event part. */
+  bodyData: Scalars['JSONObject']['output'];
+  /** The ID of the part. */
+  id: Scalars['String']['output'];
+  /** The metadata of the part. */
+  metadata: AiConversationPartMetadata;
+  /** The ID of the subscription to resolve when this event is delivered. */
+  subscriptionId?: Maybe<Scalars['String']['output']>;
+  /** The type of the part. */
+  type: AiConversationPartType;
+};
+
 export type AiConversationGetMicrosoftTeamsConversationHistoryToolCall = AiConversationBaseToolCall & {
   __typename?: 'AiConversationGetMicrosoftTeamsConversationHistoryToolCall';
   displayInfo: AiConversationToolDisplayInfo;
@@ -803,6 +831,26 @@ export type AiConversationGetMicrosoftTeamsConversationHistoryToolCall = AiConve
   rawArgs?: Maybe<Scalars['JSON']['output']>;
   /** The result of the tool call. */
   rawResult?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type AiConversationGetPullRequestCheckLogsToolCall = AiConversationBaseToolCall & {
+  __typename?: 'AiConversationGetPullRequestCheckLogsToolCall';
+  /** The arguments to the tool call. */
+  args?: Maybe<AiConversationGetPullRequestCheckLogsToolCallArgs>;
+  displayInfo: AiConversationToolDisplayInfo;
+  /** The name of the tool that was called. */
+  name: AiConversationTool;
+  /** The arguments of the tool call. */
+  rawArgs?: Maybe<Scalars['JSON']['output']>;
+  /** The result of the tool call. */
+  rawResult?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type AiConversationGetPullRequestCheckLogsToolCallArgs = {
+  __typename?: 'AiConversationGetPullRequestCheckLogsToolCallArgs';
+  checkName: Scalars['String']['output'];
+  entity: AiConversationSearchEntitiesToolCallResultEntities;
+  workflowName?: Maybe<Scalars['String']['output']>;
 };
 
 export type AiConversationGetPullRequestDiffToolCall = AiConversationBaseToolCall & {
@@ -851,6 +899,25 @@ export type AiConversationGetSlackConversationHistoryToolCall = AiConversationBa
   rawArgs?: Maybe<Scalars['JSON']['output']>;
   /** The result of the tool call. */
   rawResult?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type AiConversationHandoffToCodingSessionToolCall = AiConversationBaseToolCall & {
+  __typename?: 'AiConversationHandoffToCodingSessionToolCall';
+  /** The arguments to the tool call. */
+  args?: Maybe<AiConversationHandoffToCodingSessionToolCallArgs>;
+  displayInfo: AiConversationToolDisplayInfo;
+  /** The name of the tool that was called. */
+  name: AiConversationTool;
+  /** The arguments of the tool call. */
+  rawArgs?: Maybe<Scalars['JSON']['output']>;
+  /** The result of the tool call. */
+  rawResult?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type AiConversationHandoffToCodingSessionToolCallArgs = {
+  __typename?: 'AiConversationHandoffToCodingSessionToolCallArgs';
+  entity: AiConversationSearchEntitiesToolCallResultEntities;
+  instructions?: Maybe<Scalars['String']['output']>;
 };
 
 /** The initial source of an AI conversation. */
@@ -913,18 +980,22 @@ export type AiConversationNavigateToPageToolCall = AiConversationBaseToolCall & 
 
 export type AiConversationNavigateToPageToolCallArgs = {
   __typename?: 'AiConversationNavigateToPageToolCallArgs';
-  entityType?: Maybe<Scalars['String']['output']>;
-  identifier?: Maybe<Scalars['String']['output']>;
+  entities: Array<AiConversationNavigateToPageToolCallArgsEntities>;
+};
+
+export type AiConversationNavigateToPageToolCallArgsEntities = {
+  __typename?: 'AiConversationNavigateToPageToolCallArgsEntities';
+  entityType: Scalars['String']['output'];
+  uuid: Scalars['String']['output'];
 };
 
 export type AiConversationNavigateToPageToolCallResult = {
   __typename?: 'AiConversationNavigateToPageToolCallResult';
-  newTab?: Maybe<Scalars['Boolean']['output']>;
-  url: Scalars['String']['output'];
+  urls: Array<Scalars['String']['output']>;
 };
 
 /** A part in an AI conversation. */
-export type AiConversationPart = AiConversationPromptPart | AiConversationReasoningPart | AiConversationTextPart | AiConversationToolCallPart | AiConversationWidgetPart;
+export type AiConversationPart = AiConversationEventPart | AiConversationPromptPart | AiConversationReasoningPart | AiConversationTextPart | AiConversationToolCallPart | AiConversationWidgetPart;
 
 /** Metadata about a part in an AI conversation. */
 export type AiConversationPartMetadata = {
@@ -951,6 +1022,7 @@ export enum AiConversationPartPhase {
 
 /** The type of a part in an AI conversation. */
 export enum AiConversationPartType {
+  Event = 'event',
   Prompt = 'prompt',
   Reasoning = 'reasoning',
   Text = 'text',
@@ -1130,6 +1202,26 @@ export type AiConversationRetrieveEntitiesToolCallArgs = {
   entities: Array<AiConversationSearchEntitiesToolCallResultEntities>;
 };
 
+export type AiConversationRetryPullRequestCheckToolCall = AiConversationBaseToolCall & {
+  __typename?: 'AiConversationRetryPullRequestCheckToolCall';
+  /** The arguments to the tool call. */
+  args?: Maybe<AiConversationRetryPullRequestCheckToolCallArgs>;
+  displayInfo: AiConversationToolDisplayInfo;
+  /** The name of the tool that was called. */
+  name: AiConversationTool;
+  /** The arguments of the tool call. */
+  rawArgs?: Maybe<Scalars['JSON']['output']>;
+  /** The result of the tool call. */
+  rawResult?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type AiConversationRetryPullRequestCheckToolCallArgs = {
+  __typename?: 'AiConversationRetryPullRequestCheckToolCallArgs';
+  checkName: Scalars['String']['output'];
+  entity: AiConversationSearchEntitiesToolCallResultEntities;
+  workflowName?: Maybe<Scalars['String']['output']>;
+};
+
 export type AiConversationSearchDocumentationToolCall = AiConversationBaseToolCall & {
   __typename?: 'AiConversationSearchDocumentationToolCall';
   displayInfo: AiConversationToolDisplayInfo;
@@ -1179,7 +1271,40 @@ export enum AiConversationStatus {
   AwaitingInput = 'awaitingInput',
   Complete = 'complete',
   Error = 'error',
-  Pending = 'pending'
+  Pending = 'pending',
+  Waiting = 'waiting'
+}
+
+export type AiConversationSubscribeToEventToolCall = AiConversationBaseToolCall & {
+  __typename?: 'AiConversationSubscribeToEventToolCall';
+  /** The arguments to the tool call. */
+  args?: Maybe<AiConversationSubscribeToEventToolCallArgs>;
+  displayInfo: AiConversationToolDisplayInfo;
+  /** The name of the tool that was called. */
+  name: AiConversationTool;
+  /** The arguments of the tool call. */
+  rawArgs?: Maybe<Scalars['JSON']['output']>;
+  /** The result of the tool call. */
+  rawResult?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type AiConversationSubscribeToEventToolCallArgs = {
+  __typename?: 'AiConversationSubscribeToEventToolCallArgs';
+  endsAt?: Maybe<Scalars['String']['output']>;
+  kind?: Maybe<AiConversationSubscribeToEventToolCallArgsKind>;
+  message?: Maybe<Scalars['String']['output']>;
+  subscriptionId?: Maybe<Scalars['String']['output']>;
+  type: AiConversationSubscribeToEventToolCallArgsType;
+};
+
+export enum AiConversationSubscribeToEventToolCallArgsKind {
+  Timer = 'timer',
+  Trigger = 'trigger'
+}
+
+export enum AiConversationSubscribeToEventToolCallArgsType {
+  Once = 'once',
+  Recurring = 'recurring'
 }
 
 export type AiConversationSuggestValuesToolCall = AiConversationBaseToolCall & {
@@ -1222,9 +1347,11 @@ export enum AiConversationTool {
   CreateEntity = 'CreateEntity',
   DeleteEntity = 'DeleteEntity',
   GetMicrosoftTeamsConversationHistory = 'GetMicrosoftTeamsConversationHistory',
+  GetPullRequestCheckLogs = 'GetPullRequestCheckLogs',
   GetPullRequestDiff = 'GetPullRequestDiff',
   GetPullRequestFile = 'GetPullRequestFile',
   GetSlackConversationHistory = 'GetSlackConversationHistory',
+  HandoffToCodingSession = 'HandoffToCodingSession',
   InvokeMcpTool = 'InvokeMcpTool',
   NavigateToPage = 'NavigateToPage',
   QueryActivity = 'QueryActivity',
@@ -1233,17 +1360,20 @@ export enum AiConversationTool {
   Research = 'Research',
   RestoreEntity = 'RestoreEntity',
   RetrieveEntities = 'RetrieveEntities',
+  RetryPullRequestCheck = 'RetryPullRequestCheck',
   SearchDocumentation = 'SearchDocumentation',
   SearchEntities = 'SearchEntities',
+  SubscribeToEvent = 'SubscribeToEvent',
   SuggestValues = 'SuggestValues',
   TranscribeMedia = 'TranscribeMedia',
   TranscribeVideo = 'TranscribeVideo',
+  UnsubscribeFromEvent = 'UnsubscribeFromEvent',
   UpdateEntity = 'UpdateEntity',
   WebSearch = 'WebSearch'
 }
 
 /** The tool call. */
-export type AiConversationToolCall = AiConversationCodeIntelligenceToolCall | AiConversationCreateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationInvokeMcpToolToolCall | AiConversationNavigateToPageToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationQueryViewToolCall | AiConversationResearchToolCall | AiConversationRestoreEntityToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationSearchDocumentationToolCall | AiConversationSearchEntitiesToolCall | AiConversationSuggestValuesToolCall | AiConversationTranscribeMediaToolCall | AiConversationTranscribeVideoToolCall | AiConversationUpdateEntityToolCall | AiConversationWebSearchToolCall;
+export type AiConversationToolCall = AiConversationCodeIntelligenceToolCall | AiConversationCreateEntityToolCall | AiConversationDeleteEntityToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationInvokeMcpToolToolCall | AiConversationNavigateToPageToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationQueryViewToolCall | AiConversationResearchToolCall | AiConversationRestoreEntityToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationSearchDocumentationToolCall | AiConversationSearchEntitiesToolCall | AiConversationSubscribeToEventToolCall | AiConversationSuggestValuesToolCall | AiConversationTranscribeMediaToolCall | AiConversationTranscribeVideoToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationUpdateEntityToolCall | AiConversationWebSearchToolCall;
 
 /** A tool call part in an AI conversation. */
 export type AiConversationToolCallPart = AiConversationBasePart & {
@@ -1287,6 +1417,25 @@ export type AiConversationTranscribeVideoToolCall = AiConversationBaseToolCall &
   rawArgs?: Maybe<Scalars['JSON']['output']>;
   /** The result of the tool call. */
   rawResult?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type AiConversationUnsubscribeFromEventToolCall = AiConversationBaseToolCall & {
+  __typename?: 'AiConversationUnsubscribeFromEventToolCall';
+  /** The arguments to the tool call. */
+  args?: Maybe<AiConversationUnsubscribeFromEventToolCallArgs>;
+  displayInfo: AiConversationToolDisplayInfo;
+  /** The name of the tool that was called. */
+  name: AiConversationTool;
+  /** The arguments of the tool call. */
+  rawArgs?: Maybe<Scalars['JSON']['output']>;
+  /** The result of the tool call. */
+  rawResult?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type AiConversationUnsubscribeFromEventToolCallArgs = {
+  __typename?: 'AiConversationUnsubscribeFromEventToolCallArgs';
+  message?: Maybe<Scalars['String']['output']>;
+  subscriptionId: Scalars['String']['output'];
 };
 
 export type AiConversationUpdateEntityToolCall = AiConversationBaseToolCall & {
@@ -1468,7 +1617,7 @@ export type AiPromptRules = Node & {
   updatedBy?: Maybe<User>;
 };
 
-/** The type of AI prompt workflow. */
+/** [Internal] The type of AI prompt workflow. */
 export enum AiPromptType {
   AgentGuidance = 'agentGuidance',
   AiConversation = 'aiConversation',
@@ -1481,7 +1630,6 @@ export enum AiPromptType {
   ProductIntelligence = 'productIntelligence',
   ProjectUpdates = 'projectUpdates',
   SlackIssueIntake = 'slackIssueIntake',
-  TriageAgent = 'triageAgent',
   ZendeskIssueIntake = 'zendeskIssueIntake'
 }
 
@@ -1659,6 +1807,8 @@ export type AttachmentCreateInput = {
   commentBodyData?: InputMaybe<Scalars['JSONObject']['input']>;
   /** Create attachment as a user with the provided name. This option is only available to OAuth applications creating attachments in `actor=application` mode. */
   createAsUser?: InputMaybe<Scalars['String']['input']>;
+  /** Provide an external user avatar URL. Can only be used in conjunction with the `createAsUser` options. This option is only available to OAuth applications creating attachments in `actor=app` mode. */
+  displayIconUrl?: InputMaybe<Scalars['String']['input']>;
   /** Indicates if attachments for the same source application should be grouped in the Linear UI. */
   groupBySource?: InputMaybe<Scalars['Boolean']['input']>;
   /** An icon url to display with the attachment. Should be of jpg or png format. Maximum of 1MB in size. Dimensions should be 20x20px for optimal display quality. */
@@ -3061,6 +3211,8 @@ export type CustomerNeedCreateInput = {
   commentId?: InputMaybe<Scalars['String']['input']>;
   /** Create the need attributed to an external user with the provided name. This option is only available to OAuth applications creating needs in `actor=app` mode. */
   createAsUser?: InputMaybe<Scalars['String']['input']>;
+  /** The time at which the customer need was created (e.g. if importing from another system). Must be a time in the past. If none is provided, the backend will generate the time as now. */
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   /** The external system ID of the customer this need belongs to. Cannot be used together with customerId. */
   customerExternalId?: InputMaybe<Scalars['String']['input']>;
   /** The UUID of the customer this need belongs to. Cannot be used together with customerExternalId. */
@@ -4172,7 +4324,7 @@ export type DocumentConnection = {
   pageInfo: PageInfo;
 };
 
-/** The rich-text content body of a document, issue, project, initiative, project milestone, pull request, AI prompt rules, or welcome message. Content is stored as a base64-encoded Yjs state and can be converted to Markdown or ProseMirror JSON. Each DocumentContent belongs to exactly one parent entity and supports real-time collaborative editing. */
+/** The rich-text content body of a document, issue, project, initiative, project milestone, pull request, release note, AI prompt rules, or welcome message. Content is stored as a base64-encoded Yjs state and can be converted to Markdown or ProseMirror JSON. Each DocumentContent belongs to exactly one parent entity and supports real-time collaborative editing. */
 export type DocumentContent = Node & {
   __typename?: 'DocumentContent';
   /** The AI prompt rules that the content is associated with. Null if the content belongs to a different parent entity type. */
@@ -5221,6 +5373,8 @@ export type Favorite = Node & {
   releasePipeline?: Maybe<ReleasePipeline>;
   /** The position of this item in the user's favorites list. Lower values appear first. Used to maintain user-defined ordering within the sidebar. */
   sortOrder: Scalars['Float']['output'];
+  /** The favorited team. */
+  team?: Maybe<Team>;
   /** [Internal] Favorite's title text (name of the favorite'd object or folder). */
   title: Scalars['String']['output'];
   /** The type of entity this favorite references, such as 'issue', 'project', 'cycle', 'customView', 'document', 'folder', etc. Determines which associated entity field is populated. */
@@ -5300,6 +5454,8 @@ export type FavoriteCreateInput = {
   releasePipelineId?: InputMaybe<Scalars['String']['input']>;
   /** The position of the item in the favorites list. */
   sortOrder?: InputMaybe<Scalars['Float']['input']>;
+  /** The identifier of the team to favorite. */
+  teamId?: InputMaybe<Scalars['String']['input']>;
   /** The identifier of the user to favorite. */
   userId?: InputMaybe<Scalars['String']['input']>;
 };
@@ -5444,13 +5600,13 @@ export type FrontAttachmentPayload = {
 };
 
 export type FrontSettingsInput = {
-  /** Whether a ticket should be automatically reopened when its linked Linear issue is cancelled. */
+  /** Whether a ticket should be automatically reopened when its linked Linear issue is canceled. */
   automateTicketReopeningOnCancellation?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether a ticket should be automatically reopened when a comment is posted on its linked Linear issue */
   automateTicketReopeningOnComment?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether a ticket should be automatically reopened when its linked Linear issue is completed. */
   automateTicketReopeningOnCompletion?: InputMaybe<Scalars['Boolean']['input']>;
-  /** Whether a ticket should be automatically reopened when its linked Linear project is cancelled. */
+  /** Whether a ticket should be automatically reopened when its linked Linear project is canceled. */
   automateTicketReopeningOnProjectCancellation?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether a ticket should be automatically reopened when its linked Linear project is completed. */
   automateTicketReopeningOnProjectCompletion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -5669,6 +5825,12 @@ export type GitHubPersonalSettingsInput = {
   login: Scalars['String']['input'];
 };
 
+/** Instruction for the client after attempting to remove code access from a GitHub integration. */
+export enum GitHubRemoveCodeAccessAction {
+  Done = 'Done',
+  InstallBasicApp = 'InstallBasicApp'
+}
+
 export type GitHubRepoInput = {
   /** Whether the repository is archived. */
   archived?: InputMaybe<Scalars['Boolean']['input']>;
@@ -5740,6 +5902,10 @@ export type GitLabSettingsInput = {
   readonly?: InputMaybe<Scalars['Boolean']['input']>;
   /** The self-hosted URL of the GitLab instance. */
   url?: InputMaybe<Scalars['String']['input']>;
+  /** When true, MR webhook PR sync uses the project-scoped REST aggregator instead of GraphQL. Set automatically for teleport-routed installations whose proxies require all upstream paths to live under `/api/v4/projects/...`. */
+  useRestPrSync?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Path or numeric ID of a project to use for the setup health check. Set this when the GitLab tenant blocks non-project API endpoints; the setup check then validates against this single project instead of the personal access token endpoint. */
+  validationProjectPath?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type GitLabTestConnectionPayload = {
@@ -5947,6 +6113,10 @@ export type Initiative = Node & {
   initiativeUpdates: InitiativeUpdateConnection;
   /** Settings for all integrations associated with that initiative. */
   integrationsSettings?: Maybe<IntegrationsSettings>;
+  /** [Internal] The IDs of the initiative labels associated with this initiative. */
+  labelIds: Array<Scalars['String']['output']>;
+  /** [Internal] Labels associated with this initiative. */
+  labels: InitiativeLabelConnection;
   /** The most recent status update posted for this initiative. Null if no updates have been posted. */
   lastUpdate?: Maybe<InitiativeUpdate>;
   /** Links associated with the initiative. */
@@ -6024,6 +6194,18 @@ export type InitiativeHistoryArgs = {
 export type InitiativeInitiativeUpdatesArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<PaginationOrderBy>;
+};
+
+
+/** An initiative is a high-level strategic grouping of projects toward a business goal. Initiatives can contain multiple projects, have their own status updates and health tracking, and can be organized hierarchically with parent-child relationships. */
+export type InitiativeLabelsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<InitiativeLabelFilter>;
   first?: InputMaybe<Scalars['Int']['input']>;
   includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
@@ -6116,6 +6298,8 @@ export type InitiativeCollectionFilter = {
   id?: InputMaybe<IdComparator>;
   /** Filters that the initiative updates must satisfy. */
   initiativeUpdates?: InputMaybe<InitiativeUpdatesCollectionFilter>;
+  /** [Internal] Filters that the initiative labels must satisfy. */
+  labels?: InputMaybe<InitiativeLabelCollectionFilter>;
   /** Comparator for the collection length. */
   length?: InputMaybe<NumberComparator>;
   /** Comparator for the initiative name. */
@@ -6159,6 +6343,8 @@ export type InitiativeCreateInput = {
   icon?: InputMaybe<Scalars['String']['input']>;
   /** The identifier in UUID v4 format. If none is provided, the backend will generate one. */
   id?: InputMaybe<Scalars['String']['input']>;
+  /** [Internal] The identifiers of the initiative labels associated with this initiative. */
+  labelIds?: InputMaybe<Array<Scalars['String']['input']>>;
   /** The name of the initiative. */
   name: Scalars['String']['input'];
   /** The owner of the initiative. */
@@ -6210,6 +6396,8 @@ export type InitiativeFilter = {
   id?: InputMaybe<IdComparator>;
   /** Filters that the initiative updates must satisfy. */
   initiativeUpdates?: InputMaybe<InitiativeUpdatesCollectionFilter>;
+  /** [Internal] Filters that the initiative labels must satisfy. */
+  labels?: InputMaybe<InitiativeLabelCollectionFilter>;
   /** Comparator for the initiative name. */
   name?: InputMaybe<StringComparator>;
   /** Compound filters, one of which need to be matched by the initiative. */
@@ -6278,6 +6466,108 @@ export type InitiativeHistoryEdge = {
   /** Used in `before` and `after` args */
   cursor: Scalars['String']['output'];
   node: InitiativeHistory;
+};
+
+/** A label that can be applied to initiatives for categorization. Initiative labels are workspace-level and can be organized into groups with a parent-child hierarchy. Only child labels (not group labels) can be directly applied to initiatives. */
+export type InitiativeLabel = Node & {
+  __typename?: 'InitiativeLabel';
+  /** The time at which the entity was archived. Null if the entity has not been archived. */
+  archivedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** The label's color as a HEX string (e.g., '#EB5757'). Used for visual identification of the label in the UI. */
+  color: Scalars['String']['output'];
+  /** The time at which the entity was created. */
+  createdAt: Scalars['DateTime']['output'];
+  /** The user who created the label. */
+  creator?: Maybe<User>;
+  /** The label's description. */
+  description?: Maybe<Scalars['String']['output']>;
+  /** The unique identifier of the entity. */
+  id: Scalars['ID']['output'];
+  /** Whether the label is a group. When true, this label acts as a container for child labels and cannot be directly applied to issues or projects. When false, the label can be directly applied. */
+  isGroup: Scalars['Boolean']['output'];
+  /** The date when the label was last applied to an issue, project, or initiative. Null if the label has never been applied. */
+  lastAppliedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** The label's name. */
+  name: Scalars['String']['output'];
+  /** The workspace that the initiative label belongs to. */
+  organization: Organization;
+  /** The parent label group. If set, this label is a child within a group. Only one child label from each group can be applied to an initiative at a time. */
+  parent?: Maybe<InitiativeLabel>;
+  /** [Internal] When the label was retired. */
+  retiredAt?: Maybe<Scalars['DateTime']['output']>;
+  /** The user who retired the label. Retired labels cannot be applied to new initiatives but remain on existing ones. Null if the label is active. */
+  retiredBy?: Maybe<User>;
+  /**
+   * The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+   *     been updated after creation.
+   */
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+/** Initiative label filtering options. */
+export type InitiativeLabelCollectionFilter = {
+  /** Compound filters, all of which need to be matched by the label. */
+  and?: InputMaybe<Array<InitiativeLabelCollectionFilter>>;
+  /** Comparator for the created at date. */
+  createdAt?: InputMaybe<DateComparator>;
+  /** Filters that the initiative labels creator must satisfy. */
+  creator?: InputMaybe<NullableUserFilter>;
+  /** Filters that needs to be matched by all initiative labels. */
+  every?: InputMaybe<InitiativeLabelFilter>;
+  /** Comparator for the identifier. */
+  id?: InputMaybe<IdComparator>;
+  /** Comparator for whether the label is a group label. */
+  isGroup?: InputMaybe<BooleanComparator>;
+  /** Comparator for the collection length. */
+  length?: InputMaybe<NumberComparator>;
+  /** Comparator for the name. */
+  name?: InputMaybe<StringComparator>;
+  /** Filter based on the existence of the relation. */
+  null?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Compound filters, one of which need to be matched by the label. */
+  or?: InputMaybe<Array<InitiativeLabelCollectionFilter>>;
+  /** Filters that the initiative label's parent label must satisfy. */
+  parent?: InputMaybe<InitiativeLabelFilter>;
+  /** Filters that needs to be matched by some initiative labels. */
+  some?: InputMaybe<InitiativeLabelCollectionFilter>;
+  /** Comparator for the updated at date. */
+  updatedAt?: InputMaybe<DateComparator>;
+};
+
+export type InitiativeLabelConnection = {
+  __typename?: 'InitiativeLabelConnection';
+  edges: Array<InitiativeLabelEdge>;
+  nodes: Array<InitiativeLabel>;
+  pageInfo: PageInfo;
+};
+
+export type InitiativeLabelEdge = {
+  __typename?: 'InitiativeLabelEdge';
+  /** Used in `before` and `after` args */
+  cursor: Scalars['String']['output'];
+  node: InitiativeLabel;
+};
+
+/** Initiative label filtering options. */
+export type InitiativeLabelFilter = {
+  /** Compound filters, all of which need to be matched by the label. */
+  and?: InputMaybe<Array<InitiativeLabelFilter>>;
+  /** Comparator for the created at date. */
+  createdAt?: InputMaybe<DateComparator>;
+  /** Filters that the initiative labels creator must satisfy. */
+  creator?: InputMaybe<NullableUserFilter>;
+  /** Comparator for the identifier. */
+  id?: InputMaybe<IdComparator>;
+  /** Comparator for whether the label is a group label. */
+  isGroup?: InputMaybe<BooleanComparator>;
+  /** Comparator for the name. */
+  name?: InputMaybe<StringComparator>;
+  /** Compound filters, one of which need to be matched by the label. */
+  or?: InputMaybe<Array<InitiativeLabelFilter>>;
+  /** Filters that the initiative label's parent label must satisfy. */
+  parent?: InputMaybe<InitiativeLabelFilter>;
+  /** Comparator for the updated at date. */
+  updatedAt?: InputMaybe<DateComparator>;
 };
 
 /** Initiative manual sorting options. */
@@ -6754,6 +7044,8 @@ export type InitiativeUpdateInput = {
   frequencyResolution?: InputMaybe<FrequencyResolutionType>;
   /** The initiative's icon. */
   icon?: InputMaybe<Scalars['String']['input']>;
+  /** [Internal] The identifiers of the initiative labels associated with this initiative. */
+  labelIds?: InputMaybe<Array<Scalars['String']['input']>>;
   /** The name of the initiative. */
   name?: InputMaybe<Scalars['String']['input']>;
   /** The owner of the initiative. */
@@ -6893,6 +7185,14 @@ export type IntegrationEdge = {
   /** Used in `before` and `after` args */
   cursor: Scalars['String']['output'];
   node: Integration;
+};
+
+export type IntegrationGithubRemoveCodeAccessPayload = {
+  __typename?: 'IntegrationGithubRemoveCodeAccessPayload';
+  /** The action the client should take next. */
+  action: GitHubRemoveCodeAccessAction;
+  /** The identifier of the last sync operation. */
+  lastSyncId: Scalars['Float']['output'];
 };
 
 export type IntegrationHasScopesPayload = {
@@ -7114,7 +7414,7 @@ export type IntegrationsSettings = Node & {
   slackIssueSlaHighRisk?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to send a Slack message when any of the project or team's issues has a change in status. */
   slackIssueStatusChangedAll?: Maybe<Scalars['Boolean']['output']>;
-  /** Whether to send a Slack message when any of the project or team's issues change to completed or cancelled. */
+  /** Whether to send a Slack message when any of the project or team's issues change to completed or canceled. */
   slackIssueStatusChangedDone?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to send a Slack message when a project update is created. */
   slackProjectUpdateCreated?: Maybe<Scalars['Boolean']['output']>;
@@ -7160,7 +7460,7 @@ export type IntegrationsSettingsCreateInput = {
   slackIssueSlaHighRisk?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether to send a Slack message when any of the project or team's issues has a change in status. */
   slackIssueStatusChangedAll?: InputMaybe<Scalars['Boolean']['input']>;
-  /** Whether to send a Slack message when any of the project or team's issues change to completed or cancelled. */
+  /** Whether to send a Slack message when any of the project or team's issues change to completed or canceled. */
   slackIssueStatusChangedDone?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether to send a Slack message when a project update is created. */
   slackProjectUpdateCreated?: InputMaybe<Scalars['Boolean']['input']>;
@@ -7201,7 +7501,7 @@ export type IntegrationsSettingsUpdateInput = {
   slackIssueSlaHighRisk?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether to send a Slack message when any of the project or team's issues has a change in status. */
   slackIssueStatusChangedAll?: InputMaybe<Scalars['Boolean']['input']>;
-  /** Whether to send a Slack message when any of the project or team's issues change to completed or cancelled. */
+  /** Whether to send a Slack message when any of the project or team's issues change to completed or canceled. */
   slackIssueStatusChangedDone?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether to send a Slack message when a project update is created. */
   slackProjectUpdateCreated?: InputMaybe<Scalars['Boolean']['input']>;
@@ -7212,13 +7512,13 @@ export type IntegrationsSettingsUpdateInput = {
 };
 
 export type IntercomSettingsInput = {
-  /** Whether a ticket should be automatically reopened when its linked Linear issue is cancelled. */
+  /** Whether a ticket should be automatically reopened when its linked Linear issue is canceled. */
   automateTicketReopeningOnCancellation?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether a ticket should be automatically reopened when a comment is posted on its linked Linear issue */
   automateTicketReopeningOnComment?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether a ticket should be automatically reopened when its linked Linear issue is completed. */
   automateTicketReopeningOnCompletion?: InputMaybe<Scalars['Boolean']['input']>;
-  /** Whether a ticket should be automatically reopened when its linked Linear project is cancelled. */
+  /** Whether a ticket should be automatically reopened when its linked Linear project is canceled. */
   automateTicketReopeningOnProjectCancellation?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether a ticket should be automatically reopened when its linked Linear project is completed. */
   automateTicketReopeningOnProjectCompletion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -8449,7 +8749,7 @@ export type IssueLabel = Node & {
   isGroup: Scalars['Boolean']['output'];
   /** Issues associated with the label. */
   issues: IssueConnection;
-  /** The date when the label was last applied to an issue or project. Null if the label has never been applied. */
+  /** The date when the label was last applied to an issue, project, or initiative. Null if the label has never been applied. */
   lastAppliedAt?: Maybe<Scalars['DateTime']['output']>;
   /** The label's name. */
   name: Scalars['String']['output'];
@@ -9571,6 +9871,8 @@ export type IssueUpdateInput = {
   projectId?: InputMaybe<Scalars['String']['input']>;
   /** The project milestone associated with the issue. */
   projectMilestoneId?: InputMaybe<Scalars['String']['input']>;
+  /** The identifiers of the releases associated with this issue. */
+  releaseIds?: InputMaybe<Array<Scalars['String']['input']>>;
   /** The identifiers of the issue labels to be removed from this issue. */
   removedLabelIds?: InputMaybe<Array<Scalars['String']['input']>>;
   /** The identifiers of the releases to be removed from this issue. */
@@ -10046,6 +10348,8 @@ export type Mutation = {
   imageUploadFromUrl: ImageUploadFromUrlPayload;
   /** XHR request payload to upload a file for import, directly to Linear's cloud storage. */
   importFileUpload: UploadPayload;
+  /** [Internal]Adds a label to an initiative. */
+  initiativeAddLabel: InitiativePayload;
   /** Archives an initiative. */
   initiativeArchive: InitiativeArchivePayload;
   /** Creates a new initiative. */
@@ -10058,6 +10362,8 @@ export type Mutation = {
   initiativeRelationDelete: DeletePayload;
   /** Updates an initiative relation. */
   initiativeRelationUpdate: InitiativeRelationPayload;
+  /** [Internal]Removes a label from an initiative. */
+  initiativeRemoveLabel: InitiativePayload;
   /** Associates a project with an initiative. A project can only appear once in an initiative hierarchy. */
   initiativeToProjectCreate: InitiativeToProjectPayload;
   /** Removes a project from an initiative. */
@@ -10102,6 +10408,8 @@ export type Mutation = {
   integrationGithubImportConnect: IntegrationPayload;
   /** Refreshes the data for a GitHub import integration. */
   integrationGithubImportRefresh: IntegrationPayload;
+  /** Removes code access from a GitHub integration, downgrading to the basic GitHub App. */
+  integrationGithubRemoveCodeAccess: IntegrationGithubRemoveCodeAccessPayload;
   /** Connects the workspace with a GitLab Access Token. */
   integrationGitlabConnect: GitLabIntegrationCreatePayload;
   /** Tests connectivity to a self-hosted GitLab instance and clears auth errors if successful. */
@@ -10437,6 +10745,12 @@ export type Mutation = {
   releaseCreate: ReleasePayload;
   /** [ALPHA] Moves a release to the trash bin. Trashed releases are archived and will be permanently deleted after a retention period. If the release is already archived, it is marked as trashed with a fresh archive timestamp. */
   releaseDelete: ReleaseArchivePayload;
+  /** [ALPHA] Creates a release note. */
+  releaseNoteCreate: ReleaseNotePayload;
+  /** [ALPHA] Deletes a release note. */
+  releaseNoteDelete: DeletePayload;
+  /** [ALPHA] Updates a release note. */
+  releaseNoteUpdate: ReleaseNotePayload;
   /** [ALPHA] Archives a release pipeline. */
   releasePipelineArchive: ReleasePipelineArchivePayload;
   /** [ALPHA] Creates a new release pipeline with default stages. Subject to plan entitlement and quota limits. */
@@ -11142,6 +11456,12 @@ export type MutationImportFileUploadArgs = {
 };
 
 
+export type MutationInitiativeAddLabelArgs = {
+  id: Scalars['String']['input'];
+  labelId: Scalars['String']['input'];
+};
+
+
 export type MutationInitiativeArchiveArgs = {
   id: Scalars['String']['input'];
 };
@@ -11170,6 +11490,12 @@ export type MutationInitiativeRelationDeleteArgs = {
 export type MutationInitiativeRelationUpdateArgs = {
   id: Scalars['String']['input'];
   input: InitiativeRelationUpdateInput;
+};
+
+
+export type MutationInitiativeRemoveLabelArgs = {
+  id: Scalars['String']['input'];
+  labelId: Scalars['String']['input'];
 };
 
 
@@ -11270,6 +11596,7 @@ export type MutationIntegrationGitHubEnterpriseServerConnectArgs = {
 export type MutationIntegrationGitHubPersonalArgs = {
   code: Scalars['String']['input'];
   codeAccess?: InputMaybe<Scalars['Boolean']['input']>;
+  enterpriseUrl?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -11292,9 +11619,17 @@ export type MutationIntegrationGithubImportRefreshArgs = {
 };
 
 
+export type MutationIntegrationGithubRemoveCodeAccessArgs = {
+  integrationId: Scalars['String']['input'];
+};
+
+
 export type MutationIntegrationGitlabConnectArgs = {
   accessToken: Scalars['String']['input'];
+  expiresAt?: InputMaybe<Scalars['String']['input']>;
   gitlabUrl: Scalars['String']['input'];
+  readonly?: InputMaybe<Scalars['Boolean']['input']>;
+  validationProjectPath?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -12167,6 +12502,22 @@ export type MutationReleaseCreateArgs = {
 
 export type MutationReleaseDeleteArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type MutationReleaseNoteCreateArgs = {
+  input: ReleaseNoteCreateInput;
+};
+
+
+export type MutationReleaseNoteDeleteArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationReleaseNoteUpdateArgs = {
+  id: Scalars['String']['input'];
+  input: ReleaseNoteUpdateInput;
 };
 
 
@@ -13219,6 +13570,8 @@ export type NullableInitiativeFilter = {
   id?: InputMaybe<IdComparator>;
   /** Filters that the initiative updates must satisfy. */
   initiativeUpdates?: InputMaybe<InitiativeUpdatesCollectionFilter>;
+  /** [Internal] Filters that the initiative labels must satisfy. */
+  labels?: InputMaybe<InitiativeLabelCollectionFilter>;
   /** Comparator for the initiative name. */
   name?: InputMaybe<StringComparator>;
   /** Filter based on the existence of the relation. */
@@ -13597,6 +13950,8 @@ export type NullableTeamFilter = {
   parent?: InputMaybe<NullableTeamFilter>;
   /** Comparator for the team privacy. */
   private?: InputMaybe<BooleanComparator>;
+  /** [ALPHA] Filters that the team's release pipelines must satisfy. */
+  releasePipelines?: InputMaybe<ReleasePipelineCollectionFilter>;
   /** Comparator for the time at which the team was retired. */
   retiredAt?: InputMaybe<NullableDateComparator>;
   /** Comparator for the updated at date. */
@@ -13860,6 +14215,8 @@ export type Organization = Node & {
   codeIntelligenceRepository?: Maybe<Scalars['String']['output']>;
   /** [INTERNAL] Whether the workspace has enabled the Coding Agent. */
   codingAgentEnabled: Scalars['Boolean']['output'];
+  /** [Internal] Settings for Coding Agent features. */
+  codingAgentSettings: Scalars['JSONObject']['output'];
   /** The time at which the entity was created. */
   createdAt: Scalars['DateTime']['output'];
   /** Approximate total number of issues created in the workspace, including archived ones. This count is cached and may not reflect the exact real-time count. */
@@ -14100,6 +14457,12 @@ export type OrganizationCancelDeletePayload = {
   __typename?: 'OrganizationCancelDeletePayload';
   /** Whether the operation was successful. */
   success: Scalars['Boolean']['output'];
+};
+
+/** [Internal] Input for updating Coding Agent settings for the workspace. */
+export type OrganizationCodingAgentSettingsInput = {
+  /** [Internal] The model preference used for Coding Agent sessions. */
+  model?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Workspace deletion operation response. */
@@ -14345,6 +14708,8 @@ export type OrganizationIpRestrictionInput = {
 
 /** [Internal] An MCP server URL entry for the Linear Agent allowlist. */
 export type OrganizationLinearAgentMcpServerAllowlistEntryInput = {
+  /** [Internal] Slug of the built-in MCP integration this entry was added from, if any. */
+  knownIntegrationKey?: InputMaybe<Scalars['String']['input']>;
   /** [Internal] The MCP server URL that Linear Agent is allowed to use. */
   url: Scalars['String']['input'];
 };
@@ -14422,8 +14787,6 @@ export type OrganizationUpdateInput = {
   aiAddonEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether the workspace has enabled AI discussion summaries for issues. */
   aiDiscussionSummariesEnabled?: InputMaybe<Scalars['Boolean']['input']>;
-  /** [INTERNAL] Configure per-modality AI host providers and model families. */
-  aiProviderConfiguration?: InputMaybe<Scalars['JSONObject']['input']>;
   /** [INTERNAL] Whether the workspace has opted in to AI telemetry. */
   aiTelemetryEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether the workspace has enabled resolved thread AI summaries. */
@@ -14440,6 +14803,8 @@ export type OrganizationUpdateInput = {
   codeIntelligenceRepository?: InputMaybe<Scalars['String']['input']>;
   /** [INTERNAL] Whether the workspace has enabled the Coding Agent. */
   codingAgentEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  /** [Internal] Settings for Coding Agent features. */
+  codingAgentSettings?: InputMaybe<OrganizationCodingAgentSettingsInput>;
   /** [INTERNAL] Configuration settings for the Customers feature. */
   customersConfiguration?: InputMaybe<Scalars['JSONObject']['input']>;
   /** [INTERNAL] Whether the workspace is using customers. */
@@ -14884,7 +15249,7 @@ export type Project = Node & {
   sortOrder: Scalars['Float']['output'];
   /** The estimated start date of the project. Null if no start date is set. */
   startDate?: Maybe<Scalars['TimelessDate']['output']>;
-  /** The resolution of the project's start date, indicating whether it refers to a specific day, week, month, quarter, or year. */
+  /** The resolution of the project's start date, indicating whether it refers to a specific month, quarter, half-year, or year. */
   startDateResolution?: Maybe<DateResolutionType>;
   /** The time at which the project was moved into a started status. Null if the project has not been started. */
   startedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -14899,7 +15264,7 @@ export type Project = Node & {
   syncedWith?: Maybe<Array<ExternalEntityInfo>>;
   /** The estimated completion date of the project. Null if no target date is set. */
   targetDate?: Maybe<Scalars['TimelessDate']['output']>;
-  /** The resolution of the project's estimated completion date, indicating whether it refers to a specific day, week, month, quarter, or year. */
+  /** The resolution of the project's estimated completion date, indicating whether it refers to a specific month, quarter, half-year, or year. */
   targetDateResolution?: Maybe<DateResolutionType>;
   /** Teams associated with this project. */
   teams: TeamConnection;
@@ -15275,7 +15640,7 @@ export type ProjectCreateInput = {
   icon?: InputMaybe<Scalars['String']['input']>;
   /** The identifier in UUID v4 format. If none is provided, the backend will generate one. */
   id?: InputMaybe<Scalars['String']['input']>;
-  /** [Internal] The identifiers of the project labels associated with this project. */
+  /** The identifiers of the project labels associated with this project. */
   labelIds?: InputMaybe<Array<Scalars['String']['input']>>;
   /** The ID of the last template applied to the project. */
   lastAppliedTemplateId?: InputMaybe<Scalars['String']['input']>;
@@ -15480,7 +15845,7 @@ export type ProjectLabel = Node & {
   id: Scalars['ID']['output'];
   /** Whether the label is a group. When true, this label acts as a container for child labels and cannot be directly applied to issues or projects. When false, the label can be directly applied. */
   isGroup: Scalars['Boolean']['output'];
-  /** The date when the label was last applied to an issue or project. Null if the label has never been applied. */
+  /** The date when the label was last applied to an issue, project, or initiative. Null if the label has never been applied. */
   lastAppliedAt?: Maybe<Scalars['DateTime']['output']>;
   /** The label's name. */
   name: Scalars['String']['output'];
@@ -16271,7 +16636,7 @@ export type ProjectSearchResult = Node & {
   sortOrder: Scalars['Float']['output'];
   /** The estimated start date of the project. Null if no start date is set. */
   startDate?: Maybe<Scalars['TimelessDate']['output']>;
-  /** The resolution of the project's start date, indicating whether it refers to a specific day, week, month, quarter, or year. */
+  /** The resolution of the project's start date, indicating whether it refers to a specific month, quarter, half-year, or year. */
   startDateResolution?: Maybe<DateResolutionType>;
   /** The time at which the project was moved into a started status. Null if the project has not been started. */
   startedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -16286,7 +16651,7 @@ export type ProjectSearchResult = Node & {
   syncedWith?: Maybe<Array<ExternalEntityInfo>>;
   /** The estimated completion date of the project. Null if no target date is set. */
   targetDate?: Maybe<Scalars['TimelessDate']['output']>;
-  /** The resolution of the project's estimated completion date, indicating whether it refers to a specific day, week, month, quarter, or year. */
+  /** The resolution of the project's estimated completion date, indicating whether it refers to a specific month, quarter, half-year, or year. */
   targetDateResolution?: Maybe<DateResolutionType>;
   /** Teams associated with this project. */
   teams: TeamConnection;
@@ -17460,6 +17825,10 @@ export type Query = {
   rateLimitStatus: RateLimitPayload;
   /** [ALPHA] Fetch a single release by its UUID or slug identifier. */
   release: Release;
+  /** [ALPHA] Fetch a release note by its UUID or slug identifier. */
+  releaseNote: ReleaseNote;
+  /** [ALPHA] Release notes in the workspace. */
+  releaseNotes: ReleaseNoteConnection;
   /** [ALPHA] Fetch a single release pipeline by its UUID or slug identifier. */
   releasePipeline: ReleasePipeline;
   /** [ALPHA] Returns a release pipeline by ID. Requires the access key to have access to the pipeline. */
@@ -17502,6 +17871,8 @@ export type Query = {
   searchProjects: ProjectSearchPayload;
   /** Search for issues, projects, initiatives, and documents using natural language. Uses vector-based semantic search with optional full-text search and reranking. Results can be filtered by type and by entity-specific filters. Rate-limited to 30 requests per minute. */
   semanticSearch: SemanticSearchPayload;
+  /** Active SLA configurations that can apply to the requested team. */
+  slaConfigurations: Array<SlaConfiguration>;
   /** Fetch SSO login URL for the email provided. */
   ssoUrlFromEmail: SsoUrlFromEmailResponse;
   /** Fetches a specific team by its ID. */
@@ -18282,6 +18653,21 @@ export type QueryReleaseArgs = {
 };
 
 
+export type QueryReleaseNoteArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryReleaseNotesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<PaginationOrderBy>;
+};
+
+
 export type QueryReleasePipelineArgs = {
   id: Scalars['String']['input'];
 };
@@ -18410,6 +18796,11 @@ export type QuerySemanticSearchArgs = {
   maxResults?: InputMaybe<Scalars['Int']['input']>;
   query: Scalars['String']['input'];
   types?: InputMaybe<Array<SemanticSearchResultType>>;
+};
+
+
+export type QuerySlaConfigurationsArgs = {
+  teamId: Scalars['String']['input'];
 };
 
 
@@ -18729,6 +19120,8 @@ export type Release = Node & {
   pipeline: ReleasePipeline;
   /** [Internal] The historical progress snapshots for the release, tracking how issue completion has evolved over time. */
   progressHistory: Scalars['JSONObject']['output'];
+  /** [ALPHA] Release notes for the release. */
+  releaseNotes: Array<ReleaseNote>;
   /** The release's unique URL slug, used to construct human-readable URLs for the release. */
   slugId: Scalars['String']['output'];
   /** The current stage of the release within its pipeline (e.g., Planned, In Progress, Completed, Canceled). Changing the stage triggers lifecycle timestamp updates and may move non-closed issues to a new release when completing a scheduled pipeline release. */
@@ -18981,6 +19374,89 @@ export type ReleaseHistoryEdge = {
   node: ReleaseHistory;
 };
 
+/** [Internal] A release note. The note body is stored in related document content, and the releases it covers are tracked in releaseIds. */
+export type ReleaseNote = Node & {
+  __typename?: 'ReleaseNote';
+  /** The time at which the entity was archived. Null if the entity has not been archived. */
+  archivedAt?: Maybe<Scalars['DateTime']['output']>;
+  /** The time at which the entity was created. */
+  createdAt: Scalars['DateTime']['output'];
+  /** [Internal] Document content backing the release note body. */
+  documentContent?: Maybe<DocumentContent>;
+  /** The unique identifier of the entity. */
+  id: Scalars['ID']['output'];
+  /** The most recent release covered by this note. */
+  lastRelease?: Maybe<Release>;
+  /** [ALPHA] Releases included in the note. */
+  releases: Array<Release>;
+  /** The release note's unique URL slug, used to construct human-readable URLs for the note. */
+  slugId: Scalars['String']['output'];
+  /** [ALPHA] User-supplied title for the release note. */
+  title?: Maybe<Scalars['String']['output']>;
+  /**
+   * The last time at which the entity was meaningfully updated. This is the same as the creation time if the entity hasn't
+   *     been updated after creation.
+   */
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ReleaseNoteConnection = {
+  __typename?: 'ReleaseNoteConnection';
+  edges: Array<ReleaseNoteEdge>;
+  nodes: Array<ReleaseNote>;
+  pageInfo: PageInfo;
+};
+
+/** [ALPHA] Input for creating a release note. */
+export type ReleaseNoteCreateInput = {
+  /** The release note body as markdown. */
+  content?: InputMaybe<Scalars['String']['input']>;
+  /** The identifier in UUID v4 format. If none is provided, the backend will generate one. */
+  id?: InputMaybe<Scalars['String']['input']>;
+  /** Identifier of the release pipeline. */
+  pipelineId: Scalars['String']['input'];
+  /** Oldest release (by createdAt) to include. When paired with rangeToReleaseId, expands to every release in the pipeline within the createdAt window. */
+  rangeFromReleaseId?: InputMaybe<Scalars['String']['input']>;
+  /** Newest release (by createdAt) to include. Paired with rangeFromReleaseId. */
+  rangeToReleaseId?: InputMaybe<Scalars['String']['input']>;
+  /** Explicit release IDs to include. Mutually exclusive with rangeFromReleaseId/rangeToReleaseId — exactly one of the two shapes must be provided. */
+  releaseIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  /** Optional user-supplied title. */
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ReleaseNoteEdge = {
+  __typename?: 'ReleaseNoteEdge';
+  /** Used in `before` and `after` args */
+  cursor: Scalars['String']['output'];
+  node: ReleaseNote;
+};
+
+/** [ALPHA] The result of a release note mutation. */
+export type ReleaseNotePayload = {
+  __typename?: 'ReleaseNotePayload';
+  /** The identifier of the last sync operation. */
+  lastSyncId: Scalars['Float']['output'];
+  /** The release note that was created or updated. */
+  releaseNote: ReleaseNote;
+  /** Whether the operation was successful. */
+  success: Scalars['Boolean']['output'];
+};
+
+/** [ALPHA] Input for updating a release note. */
+export type ReleaseNoteUpdateInput = {
+  /** The release note body as markdown. */
+  content?: InputMaybe<Scalars['String']['input']>;
+  /** Oldest release (by createdAt) of the new range. Paired with rangeToReleaseId. */
+  rangeFromReleaseId?: InputMaybe<Scalars['String']['input']>;
+  /** Newest release (by createdAt) of the new range. Paired with rangeFromReleaseId. */
+  rangeToReleaseId?: InputMaybe<Scalars['String']['input']>;
+  /** Explicit release IDs to set. Mutually exclusive with rangeFromReleaseId/rangeToReleaseId. */
+  releaseIds?: InputMaybe<Array<Scalars['String']['input']>>;
+  /** Optional user-supplied title. */
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
 /** The result of a release mutation, containing the release that was created or updated and a success indicator. */
 export type ReleasePayload = {
   __typename?: 'ReleasePayload';
@@ -19007,8 +19483,12 @@ export type ReleasePipeline = Node & {
   includePathPatterns: Array<Scalars['String']['output']>;
   /** [ALPHA] Whether this pipeline targets a production environment. Defaults to true. Used to distinguish production pipelines from staging or development pipelines. */
   isProduction: Scalars['Boolean']['output'];
+  /** The release note in this pipeline whose covered range ends with the most recent release. */
+  latestReleaseNote?: Maybe<ReleaseNote>;
   /** The name of the pipeline. */
   name: Scalars['String']['output'];
+  /** [Internal] The document template used to define the release notes format for this pipeline. AI-generated release notes follow the structure and tone of this template. Null if no template has been configured. */
+  releaseNoteTemplate?: Maybe<Template>;
   /** [ALPHA] Releases associated with this pipeline. */
   releases: ReleaseConnection;
   /** The pipeline's unique slug identifier, used in URLs and for lookup by human-readable identifier instead of UUID. */
@@ -19073,6 +19553,32 @@ export type ReleasePipelineArchivePayload = ArchivePayload & {
   success: Scalars['Boolean']['output'];
 };
 
+/** [ALPHA] Release pipeline collection filtering options. */
+export type ReleasePipelineCollectionFilter = {
+  /** Compound filters, all of which need to be matched by the release pipeline. */
+  and?: InputMaybe<Array<ReleasePipelineCollectionFilter>>;
+  /** Comparator for the created at date. */
+  createdAt?: InputMaybe<DateComparator>;
+  /** Filters that needs to be matched by all release pipelines. */
+  every?: InputMaybe<ReleasePipelineFilter>;
+  /** Comparator for the identifier. */
+  id?: InputMaybe<IdComparator>;
+  /** Comparator for the pipeline production flag. */
+  isProduction?: InputMaybe<BooleanComparator>;
+  /** Comparator for the collection length. */
+  length?: InputMaybe<NumberComparator>;
+  /** Comparator for the pipeline name. */
+  name?: InputMaybe<StringComparator>;
+  /** Compound filters, one of which need to be matched by the release pipeline. */
+  or?: InputMaybe<Array<ReleasePipelineCollectionFilter>>;
+  /** Filters that needs to be matched by some release pipelines. */
+  some?: InputMaybe<ReleasePipelineFilter>;
+  /** Filters that the release pipeline's teams must satisfy. */
+  teams?: InputMaybe<TeamCollectionFilter>;
+  /** Comparator for the updated at date. */
+  updatedAt?: InputMaybe<DateComparator>;
+};
+
 export type ReleasePipelineConnection = {
   __typename?: 'ReleasePipelineConnection';
   edges: Array<ReleasePipelineEdge>;
@@ -19119,6 +19625,8 @@ export type ReleasePipelineFilter = {
   name?: InputMaybe<StringComparator>;
   /** Compound filters, one of which need to be matched by the pipeline. */
   or?: InputMaybe<Array<ReleasePipelineFilter>>;
+  /** Filters that the release pipeline's teams must satisfy. */
+  teams?: InputMaybe<TeamCollectionFilter>;
   /** Comparator for the updated at date. */
   updatedAt?: InputMaybe<DateComparator>;
 };
@@ -19707,13 +20215,13 @@ export type SalesforceMetadataIntegrationComparator = {
 };
 
 export type SalesforceSettingsInput = {
-  /** Whether a ticket should be automatically reopened when its linked Linear issue is cancelled. */
+  /** Whether a ticket should be automatically reopened when its linked Linear issue is canceled. */
   automateTicketReopeningOnCancellation?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether a ticket should be automatically reopened when a comment is posted on its linked Linear issue */
   automateTicketReopeningOnComment?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether a ticket should be automatically reopened when its linked Linear issue is completed. */
   automateTicketReopeningOnCompletion?: InputMaybe<Scalars['Boolean']['input']>;
-  /** Whether a ticket should be automatically reopened when its linked Linear project is cancelled. */
+  /** Whether a ticket should be automatically reopened when its linked Linear project is canceled. */
   automateTicketReopeningOnProjectCancellation?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether a ticket should be automatically reopened when its linked Linear project is completed. */
   automateTicketReopeningOnProjectCompletion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -19851,6 +20359,23 @@ export type SizeSort = {
   nulls?: InputMaybe<PaginationNulls>;
   /** The order for the individual sort */
   order?: InputMaybe<PaginationSortOrder>;
+};
+
+/** An active SLA rule that can apply to a team. */
+export type SlaConfiguration = {
+  __typename?: 'SlaConfiguration';
+  /** The workflow conditions that determine when this SLA rule applies. */
+  conditions: Scalars['JSONObject']['output'];
+  /** The identifier of the SLA rule. */
+  id: Scalars['String']['output'];
+  /** The name of the SLA rule. */
+  name: Scalars['String']['output'];
+  /** Whether the rule removes an SLA instead of setting one. */
+  removesSla: Scalars['Boolean']['output'];
+  /** The SLA value configured by the rule, expressed in milliseconds or business days depending on the day-count type. */
+  sla?: Maybe<Scalars['Float']['output']>;
+  /** The SLA type used when the rule sets an SLA. */
+  slaType?: Maybe<SlaDayCountType>;
 };
 
 export enum SlaStatus {
@@ -20618,6 +21143,8 @@ export type Team = Node & {
   progressHistory: Scalars['JSONObject']['output'];
   /** Projects associated with the team. */
   projects: ProjectConnection;
+  /** [ALPHA] Release pipelines associated with the team. */
+  releasePipelines: ReleasePipelineConnection;
   /** Whether an issue needs to have a priority set before leaving triage. */
   requirePriorityToLeaveTriage: Scalars['Boolean']['output'];
   /** The time at which the team was retired. Retired teams no longer accept new issues or members. Null if the team has not been retired. */
@@ -20776,6 +21303,18 @@ export type TeamProjectsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<PaginationOrderBy>;
   sort?: InputMaybe<Array<ProjectSortInput>>;
+};
+
+
+/** A team is the primary organizational unit in Linear. Issues belong to teams, and each team has its own workflow states, cycles, labels, and settings. Teams can be public (visible to all workspace members) or private (visible only to team members). Teams can also have sub-teams that inherit settings from their parent. */
+export type TeamReleasePipelinesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<ReleasePipelineFilter>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  includeArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<PaginationOrderBy>;
 };
 
 
@@ -20967,6 +21506,8 @@ export type TeamFilter = {
   parent?: InputMaybe<NullableTeamFilter>;
   /** Comparator for the team privacy. */
   private?: InputMaybe<BooleanComparator>;
+  /** [ALPHA] Filters that the team's release pipelines must satisfy. */
+  releasePipelines?: InputMaybe<ReleasePipelineCollectionFilter>;
   /** Comparator for the time at which the team was retired. */
   retiredAt?: InputMaybe<NullableDateComparator>;
   /** Comparator for the updated at date. */
@@ -21217,6 +21758,8 @@ export type TeamUpdateInput = {
   requirePriorityToLeaveTriage?: InputMaybe<Scalars['Boolean']['input']>;
   /** When the team was retired. */
   retiredAt?: InputMaybe<Scalars['DateTime']['input']>;
+  /** The SCIM group name for the team. */
+  scimGroupName?: InputMaybe<Scalars['String']['input']>;
   /** Whether the team is managed by SCIM integration. Mutation restricted to workspace admins or owners and only unsetting is allowed! */
   scimManaged?: InputMaybe<Scalars['Boolean']['input']>;
   /** The security settings for the team. */
@@ -21268,6 +21811,8 @@ export type Template = Node & {
   name: Scalars['String']['output'];
   /** The workspace that owns this template. */
   organization: Organization;
+  /** [Internal] The release pipeline this template is bound to. Required when the template type is 'releaseNote' and forbidden otherwise. The pipeline owns at most one release note template, which defines the format AI follows when generating release notes. */
+  pipeline?: Maybe<ReleasePipeline>;
   /** The sort order of the template within the templates list. */
   sortOrder: Scalars['Float']['output'];
   /** The team that the template is associated with. If null, the template is global to the workspace. */
@@ -21302,6 +21847,8 @@ export type TemplateCreateInput = {
   id?: InputMaybe<Scalars['String']['input']>;
   /** The template name. */
   name: Scalars['String']['input'];
+  /** The identifier of the release pipeline this template is bound to. Required when the template type is 'releaseNote' and rejected otherwise. Each pipeline can have at most one release note template. */
+  pipelineId?: InputMaybe<Scalars['String']['input']>;
   /** The sort position of the template in the templates list. */
   sortOrder?: InputMaybe<Scalars['Float']['input']>;
   /** The identifier or key of the team associated with the template. If not given, the template will be shared across all teams. */
@@ -21476,6 +22023,8 @@ export type TitleSort = {
 };
 
 export type TokenUserAccountAuthInput = {
+  /** Auth code for the client initiating the login sequence. */
+  clientAuthCode?: InputMaybe<Scalars['String']['input']>;
   /** The email which to login via the magic login code. */
   email: Scalars['String']['input'];
   /** An optional invite link for a workspace. */
@@ -22327,6 +22876,15 @@ export type ViewPreferencesCreateInput = {
   viewType: ViewType;
 };
 
+/** A label group column configuration for the initiative list view. */
+export type ViewPreferencesInitiativeLabelGroupColumn = {
+  __typename?: 'ViewPreferencesInitiativeLabelGroupColumn';
+  /** Whether the label group column is active. */
+  active: Scalars['Boolean']['output'];
+  /** The identifier of the label group. */
+  id: Scalars['String']['output'];
+};
+
 /** The result of a view preferences mutation. */
 export type ViewPreferencesPayload = {
   __typename?: 'ViewPreferencesPayload';
@@ -22370,6 +22928,14 @@ export type ViewPreferencesValues = {
   columnOrderBoard?: Maybe<Array<Scalars['String']['output']>>;
   /** Custom ordering of groups on the list layout. */
   columnOrderList?: Maybe<Array<Scalars['String']['output']>>;
+  /** Whether to show the release date field for continuous pipeline releases. */
+  continuousPipelineReleaseFieldReleaseDate?: Maybe<Scalars['Boolean']['output']>;
+  /** Whether to show the release-note field for continuous pipeline releases. */
+  continuousPipelineReleaseFieldReleaseNote?: Maybe<Scalars['Boolean']['output']>;
+  /** Whether to show the version field for continuous pipeline releases. */
+  continuousPipelineReleaseFieldVersion?: Maybe<Scalars['Boolean']['output']>;
+  /** The continuous pipeline releases view grouping. */
+  continuousPipelineReleasesViewGrouping?: Maybe<Scalars['String']['output']>;
   /** Whether to show the custom view creation date field. */
   customViewFieldDateCreated?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to show the custom view updated date field. */
@@ -22478,6 +23044,8 @@ export type ViewPreferencesValues = {
   focusViewOrdering?: Maybe<Scalars['String']['output']>;
   /** The focus view ordering direction. */
   focusViewOrderingDirection?: Maybe<Scalars['String']['output']>;
+  /** The ordering mode for groups. Supersedes projectGroupOrdering. */
+  groupOrderingMode?: Maybe<Scalars['String']['output']>;
   /** List of column model IDs which should be hidden on a board. */
   hiddenColumns?: Maybe<Array<Scalars['String']['output']>>;
   /** List of group model IDs which should be hidden on a list. */
@@ -22500,6 +23068,8 @@ export type ViewPreferencesValues = {
   initiativeFieldHealth?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to show the initiative health field. */
   initiativeFieldInitiativeHealth?: Maybe<Scalars['Boolean']['output']>;
+  /** [Internal] Whether to show the initiative labels field. */
+  initiativeFieldLabels?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to show the initiative owner field. */
   initiativeFieldOwner?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to show the initiative projects field. */
@@ -22514,6 +23084,10 @@ export type ViewPreferencesValues = {
   initiativeFieldTeams?: Maybe<Scalars['Boolean']['output']>;
   /** The initiative grouping. */
   initiativeGrouping?: Maybe<Scalars['String']['output']>;
+  /** [Internal] The label group ID used for initiative grouping. */
+  initiativeGroupingLabelGroupId?: Maybe<Scalars['String']['output']>;
+  /** [Internal] The initiative label group columns configuration. */
+  initiativeLabelGroupColumns?: Maybe<Array<ViewPreferencesInitiativeLabelGroupColumn>>;
   /** The initiative ordering. */
   initiativesViewOrdering?: Maybe<Scalars['String']['output']>;
   /** The issue grouping. */
@@ -22564,6 +23138,8 @@ export type ViewPreferencesValues = {
   projectFieldHealthTimeline?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to show the project initiatives field. */
   projectFieldInitiatives?: Maybe<Scalars['Boolean']['output']>;
+  /** Whether to show the project issue count field. */
+  projectFieldIssues?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to show the project labels field. */
   projectFieldLabels?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to show the project lead field. */
@@ -22618,7 +23194,10 @@ export type ViewPreferencesValues = {
   projectFieldTeamsList?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to show the project teams field on the timeline. */
   projectFieldTeamsTimeline?: Maybe<Scalars['Boolean']['output']>;
-  /** The ordering of project groups. */
+  /**
+   * The ordering of project groups.
+   * @deprecated Use groupOrderingMode instead.
+   */
   projectGroupOrdering?: Maybe<Scalars['String']['output']>;
   /** The project grouping. */
   projectGrouping?: Maybe<Scalars['String']['output']>;
@@ -22689,6 +23268,8 @@ export type ViewPreferencesValues = {
   scheduledPipelineReleaseFieldDescription?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to show the release date field for scheduled pipeline releases. */
   scheduledPipelineReleaseFieldReleaseDate?: Maybe<Scalars['Boolean']['output']>;
+  /** Whether to show the release-note field for scheduled pipeline releases. */
+  scheduledPipelineReleaseFieldReleaseNote?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to show the version field for scheduled pipeline releases. */
   scheduledPipelineReleaseFieldVersion?: Maybe<Scalars['Boolean']['output']>;
   /** The scheduled pipeline releases view grouping. */
@@ -22829,6 +23410,7 @@ export enum ViewType {
   ProjectsClosed = 'projectsClosed',
   QuickView = 'quickView',
   Release = 'release',
+  ReleaseOverviewIssues = 'releaseOverviewIssues',
   ReleasePipelines = 'releasePipelines',
   Reviews = 'reviews',
   Roadmap = 'roadmap',
@@ -23290,13 +23872,13 @@ export enum WorkflowType {
 }
 
 export type ZendeskSettingsInput = {
-  /** Whether a ticket should be automatically reopened when its linked Linear issue is cancelled. */
+  /** Whether a ticket should be automatically reopened when its linked Linear issue is canceled. */
   automateTicketReopeningOnCancellation?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether a ticket should be automatically reopened when a comment is posted on its linked Linear issue */
   automateTicketReopeningOnComment?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether a ticket should be automatically reopened when its linked Linear issue is completed. */
   automateTicketReopeningOnCompletion?: InputMaybe<Scalars['Boolean']['input']>;
-  /** Whether a ticket should be automatically reopened when its linked Linear project is cancelled. */
+  /** Whether a ticket should be automatically reopened when its linked Linear project is canceled. */
   automateTicketReopeningOnProjectCancellation?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether a ticket should be automatically reopened when its linked Linear project is completed. */
   automateTicketReopeningOnProjectCompletion?: InputMaybe<Scalars['Boolean']['input']>;
@@ -23687,6 +24269,7 @@ export type ProjectDetailFieldsFragment = { __typename?: 'Project', content?: st
 export type GetProjectsQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
   after?: InputMaybe<Scalars['String']['input']>;
+  filter?: InputMaybe<ProjectFilter>;
 }>;
 
 
@@ -23787,7 +24370,7 @@ export const ListProjectMilestonesDocument = {"kind":"Document","definitions":[{
 export const GetProjectMilestoneByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetProjectMilestoneById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"issuesFirst"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projectMilestone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"targetDate"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"project"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"issues"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"issuesFirst"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CompleteIssueFields"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CompleteIssueFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Issue"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"identifier"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"branchName"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"estimate"}},{"kind":"Field","name":{"kind":"Name","value":"dueDate"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"state"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"assignee"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"team"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"project"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"cycle"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"number"}}]}},{"kind":"Field","name":{"kind":"Name","value":"projectMilestone"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"targetDate"}}]}},{"kind":"Field","name":{"kind":"Name","value":"parent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"identifier"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"children"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"identifier"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"relations"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"relatedIssue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"identifier"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"inverseRelations"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"issue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"identifier"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetProjectMilestoneByIdQuery, GetProjectMilestoneByIdQueryVariables>;
 export const FindProjectMilestoneScopedDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FindProjectMilestoneScoped"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"projectId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"project"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"projectId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projectMilestones"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"name"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"targetDate"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}},{"kind":"Field","name":{"kind":"Name","value":"project"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<FindProjectMilestoneScopedQuery, FindProjectMilestoneScopedQueryVariables>;
 export const FindProjectMilestoneGlobalDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FindProjectMilestoneGlobal"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projectMilestones"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"name"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"targetDate"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}},{"kind":"Field","name":{"kind":"Name","value":"project"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<FindProjectMilestoneGlobalQuery, FindProjectMilestoneGlobalQueryVariables>;
-export const GetProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"50"}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectListFields"}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProjectListFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Project"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"status"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}},{"kind":"Field","name":{"kind":"Name","value":"slugId"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"priorityLabel"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"progress"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"targetDate"}},{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","name":{"kind":"Name","value":"lead"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"teams"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}}]}}]}}]} as unknown as DocumentNode<GetProjectsQuery, GetProjectsQueryVariables>;
+export const GetProjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetProjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"50"}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ProjectFilter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}},{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectListFields"}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProjectListFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Project"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"status"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}},{"kind":"Field","name":{"kind":"Name","value":"slugId"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"priorityLabel"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"progress"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"targetDate"}},{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","name":{"kind":"Name","value":"lead"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"teams"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}}]}}]}}]} as unknown as DocumentNode<GetProjectsQuery, GetProjectsQueryVariables>;
 export const GetProjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetProject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"project"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectDetailFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProjectListFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Project"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"status"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}},{"kind":"Field","name":{"kind":"Name","value":"slugId"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"priorityLabel"}},{"kind":"Field","name":{"kind":"Name","value":"health"}},{"kind":"Field","name":{"kind":"Name","value":"progress"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"targetDate"}},{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","name":{"kind":"Name","value":"lead"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"teams"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"labels"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"color"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProjectDetailFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Project"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProjectListFields"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"icon"}},{"kind":"Field","name":{"kind":"Name","value":"color"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"startedAt"}},{"kind":"Field","name":{"kind":"Name","value":"completedAt"}},{"kind":"Field","name":{"kind":"Name","value":"canceledAt"}},{"kind":"Field","name":{"kind":"Name","value":"creator"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"members"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"projectMilestones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"targetDate"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"initiatives"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetProjectQuery, GetProjectQueryVariables>;
 export const GetProjectStatusesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetProjectStatuses"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projectStatuses"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetProjectStatusesQuery, GetProjectStatusesQueryVariables>;
 export const GetTeamsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTeams"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"50"}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"teams"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"TeamFields"}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"TeamFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Team"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"key"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]} as unknown as DocumentNode<GetTeamsQuery, GetTeamsQueryVariables>;

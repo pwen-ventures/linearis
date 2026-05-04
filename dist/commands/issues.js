@@ -245,10 +245,12 @@ export function setupIssuesCommands(program) {
         const [title, options, command] = args;
         const ctx = createContext(command.parent.parent.opts());
         const relationActions = parseRelationFlags(options);
-        if (!options.team) {
-            throw new Error("--team is required");
+        const teamId = options.team
+            ? await resolveTeamId(ctx.sdk, options.team)
+            : ctx.defaultTeamId;
+        if (!teamId) {
+            throw new Error("--team is required (or configure a defaultTeamId on the active profile)");
         }
-        const teamId = await resolveTeamId(ctx.sdk, options.team);
         const input = {
             title,
             teamId,
