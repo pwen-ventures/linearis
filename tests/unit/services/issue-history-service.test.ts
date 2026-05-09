@@ -6,9 +6,17 @@ import {
   getIssueHistory,
 } from "../../../src/services/issue-history-service.js";
 
-function mockGqlClient(response: Record<string, unknown>): GraphQLClient {
+function mockGqlClient(
+  responses: Record<string, unknown> | Record<string, unknown>[],
+): GraphQLClient {
+  const queue = Array.isArray(responses) ? [...responses] : [responses];
   return {
-    request: vi.fn().mockResolvedValue(response),
+    request: vi.fn().mockImplementation(() => {
+      if (queue.length === 0) {
+        throw new Error("mockGqlClient: no more queued responses");
+      }
+      return Promise.resolve(queue.shift());
+    }),
   } as unknown as GraphQLClient;
 }
 
@@ -51,7 +59,7 @@ describe("getIssueHistory", () => {
 });
 
 describe("getIssueDescriptionHistory", () => {
-  it("returns the history array on success", async () => {
+  it("resolves documentContent.id then fetches history", async () => {
     const entry = {
       id: "ver-1",
       createdAt: "2026-01-01T00:00:00Z",
@@ -60,19 +68,46 @@ describe("getIssueDescriptionHistory", () => {
       contentData: { type: "doc" },
       metadata: null,
     };
-    const client = mockGqlClient({
-      documentContentHistory: { success: true, history: [entry] },
-    });
+    const client = mockGqlClient([
+      { issue: { id: "issue-1", documentContent: { id: "doc-1" } } },
+      { documentContentHistory: { success: true, history: [entry] } },
+    ]);
 
     const result = await getIssueDescriptionHistory(client, "issue-1");
 
-    expect(result.history).toEqual([entry]);
+    expect(result.nodes).toEqual([entry]);
+    expect(client.request).toHaveBeenCalledTimes(2);
+    expect(client.request).toHaveBeenNthCalledWith(1, expect.anything(), {
+      id: "issue-1",
+    });
+    expect(client.request).toHaveBeenNthCalledWith(2, expect.anything(), {
+      documentContentId: "doc-1",
+    });
   });
 
-  it("throws when the payload reports failure", async () => {
+  it("throws when the issue has no documentContent", async () => {
     const client = mockGqlClient({
-      documentContentHistory: { success: false, history: [] },
+      issue: { id: "issue-1", documentContent: null },
     });
+
+    await expect(getIssueDescriptionHistory(client, "issue-1")).rejects.toThrow(
+      "has no documentContent",
+    );
+  });
+
+  it("throws when the issue is not found", async () => {
+    const client = mockGqlClient({ issue: null });
+
+    await expect(getIssueDescriptionHistory(client, "missing")).rejects.toThrow(
+      'Issue with ID "missing" not found',
+    );
+  });
+
+  it("throws when the history payload reports failure", async () => {
+    const client = mockGqlClient([
+      { issue: { id: "issue-1", documentContent: { id: "doc-1" } } },
+      { documentContentHistory: { success: false, history: [] } },
+    ]);
 
     await expect(getIssueDescriptionHistory(client, "issue-1")).rejects.toThrow(
       "Failed to fetch description history",
@@ -90,12 +125,15 @@ describe("getIssueDescriptionHistoryEntry", () => {
       contentData: { type: "doc", content: [] },
       metadata: null,
     };
-    const client = mockGqlClient({
-      documentContentHistory: {
-        success: true,
-        history: [{ id: "ver-1" }, entry],
+    const client = mockGqlClient([
+      { issue: { id: "issue-1", documentContent: { id: "doc-1" } } },
+      {
+        documentContentHistory: {
+          success: true,
+          history: [{ id: "ver-1" }, entry],
+        },
       },
-    });
+    ]);
 
     const result = await getIssueDescriptionHistoryEntry(
       client,
@@ -107,12 +145,10 @@ describe("getIssueDescriptionHistoryEntry", () => {
   });
 
   it("throws when no entry matches the version id", async () => {
-    const client = mockGqlClient({
-      documentContentHistory: {
-        success: true,
-        history: [{ id: "ver-1" }],
-      },
-    });
+    const client = mockGqlClient([
+      { issue: { id: "issue-1", documentContent: { id: "doc-1" } } },
+      { documentContentHistory: { success: true, history: [{ id: "ver-1" }] } },
+    ]);
 
     await expect(
       getIssueDescriptionHistoryEntry(client, "issue-1", "missing"),

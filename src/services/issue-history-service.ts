@@ -2,8 +2,10 @@ import type { GraphQLClient } from "../client/graphql-client.js";
 import type { PaginatedResult, PaginationOptions } from "../common/types.js";
 import {
   type DocumentContentHistoryFieldsFragment,
-  GetIssueDescriptionHistoryDocument,
-  type GetIssueDescriptionHistoryQuery,
+  GetDocumentContentHistoryDocument,
+  type GetDocumentContentHistoryQuery,
+  GetIssueDocumentContentIdDocument,
+  type GetIssueDocumentContentIdQuery,
   GetIssueHistoryDocument,
   type GetIssueHistoryQuery,
   type IssueHistoryFieldsFragment,
@@ -34,13 +36,43 @@ export async function getIssueHistory(
   };
 }
 
+// Linear's `documentContentHistory(id:)` query takes a DocumentContent.id,
+// not an Issue.id — they are distinct entities. Resolve the issue's
+// documentContent.id first, then fetch the history with it.
+async function resolveIssueDocumentContentId(
+  client: GraphQLClient,
+  issueId: string,
+): Promise<string> {
+  const result = await client.request<GetIssueDocumentContentIdQuery>(
+    GetIssueDocumentContentIdDocument,
+    { id: issueId },
+  );
+
+  if (!result.issue) {
+    throw new Error(`Issue with ID "${issueId}" not found`);
+  }
+
+  if (!result.issue.documentContent?.id) {
+    throw new Error(
+      `Issue "${issueId}" has no documentContent (description has never been edited via the Linear editor)`,
+    );
+  }
+
+  return result.issue.documentContent.id;
+}
+
 export async function getIssueDescriptionHistory(
   client: GraphQLClient,
   issueId: string,
-): Promise<{ history: IssueDescriptionHistoryEntry[] }> {
-  const result = await client.request<GetIssueDescriptionHistoryQuery>(
-    GetIssueDescriptionHistoryDocument,
-    { id: issueId },
+): Promise<{ nodes: IssueDescriptionHistoryEntry[] }> {
+  const documentContentId = await resolveIssueDocumentContentId(
+    client,
+    issueId,
+  );
+
+  const result = await client.request<GetDocumentContentHistoryQuery>(
+    GetDocumentContentHistoryDocument,
+    { documentContentId },
   );
 
   if (!result.documentContentHistory.success) {
@@ -49,7 +81,7 @@ export async function getIssueDescriptionHistory(
     );
   }
 
-  return { history: result.documentContentHistory.history };
+  return { nodes: result.documentContentHistory.history };
 }
 
 export async function getIssueDescriptionHistoryEntry(
@@ -57,8 +89,8 @@ export async function getIssueDescriptionHistoryEntry(
   issueId: string,
   versionId: string,
 ): Promise<IssueDescriptionHistoryEntry> {
-  const { history } = await getIssueDescriptionHistory(client, issueId);
-  const entry = history.find((node) => node.id === versionId);
+  const { nodes } = await getIssueDescriptionHistory(client, issueId);
+  const entry = nodes.find((node) => node.id === versionId);
   if (!entry) {
     throw new Error(
       `Description history entry "${versionId}" not found for issue "${issueId}"`,

@@ -5,6 +5,10 @@
 # `description` field is a server-side markdown rendering of the latest
 # state. Reverting an issue's description is done by passing a historical
 # `contentData` payload back through `issueUpdate(input: { descriptionData })`.
+#
+# `documentContentHistory(id:)` expects a DocumentContent.id, NOT an
+# Issue.id — they are distinct entities. The service fetches the
+# DocumentContent.id first, then queries history with it.
 
 fragment DocumentContentHistoryFields on DocumentContentHistoryType {
   id
@@ -15,8 +19,17 @@ fragment DocumentContentHistoryFields on DocumentContentHistoryType {
   metadata
 }
 
-query GetIssueDescriptionHistory($id: String!) {
-  documentContentHistory(id: $id) {
+query GetIssueDocumentContentId($id: String!) {
+  issue(id: $id) {
+    id
+    documentContent {
+      id
+    }
+  }
+}
+
+query GetDocumentContentHistory($documentContentId: String!) {
+  documentContentHistory(id: $documentContentId) {
     success
     history {
       ...DocumentContentHistoryFields
