@@ -25,6 +25,11 @@ import { resolveStatusId } from "../resolvers/status-resolver.js";
 import { resolveUserId } from "../resolvers/user-resolver.js";
 import { buildIssueFilter } from "../services/issue-filter.js";
 import {
+  getIssueDescriptionHistory,
+  getIssueDescriptionHistoryEntry,
+  getIssueHistory,
+} from "../services/issue-history-service.js";
+import {
   createIssueRelation,
   deleteIssueRelation,
   findIssueRelation,
@@ -73,6 +78,7 @@ interface CreateOptions {
 interface UpdateOptions {
   title?: string;
   description?: string;
+  descriptionFromHistory?: string;
   status?: string;
   priority?: string;
   estimate?: string;
@@ -123,6 +129,9 @@ export const ISSUES_META: DomainMeta = {
     "issues read --with-attachments",
     "issues subscribe <issue>",
     "issues subscribers <issue>",
+    "issues history <issue>",
+    "issues description-history <issue>",
+    "issues update <issue> --description-from-history <version-id>",
   ],
 };
 
@@ -407,6 +416,55 @@ export function setupIssuesCommands(program: Command): void {
     );
 
   issues
+    .command("history <issue>")
+    .description("list state transitions and field changes for an issue")
+    .option("-l, --limit <n>", "max entries", "25")
+    .option("--after <cursor>", "cursor for next page")
+    .addHelpText(
+      "after",
+      `\nWhen passing issue IDs, both UUID and identifiers like ABC-123 are supported.`,
+    )
+    .action(
+      handleCommand(async (...args: unknown[]) => {
+        const [issue, options, command] = args as [
+          string,
+          { limit: string; after?: string },
+          Command,
+        ];
+        const ctx = createContext(command.parent!.parent!.opts());
+        const issueId = await resolveIssueId(ctx.sdk, issue);
+        const result = await getIssueHistory(ctx.gql, issueId, {
+          limit: parseLimit(options.limit),
+          after: options.after,
+        });
+        outputSuccess(result);
+      }),
+    );
+
+  issues
+    .command("description-history <issue>")
+    .description("list historical description snapshots for an issue")
+    .addHelpText(
+      "after",
+      `\nReturns ProseMirror JSON snapshots (contentData). Pass an entry's id to
+\`issues update --description-from-history <id>\` to revert.
+When passing issue IDs, both UUID and identifiers like ABC-123 are supported.`,
+    )
+    .action(
+      handleCommand(async (...args: unknown[]) => {
+        const [issue, _options, command] = args as [
+          string,
+          Record<string, never>,
+          Command,
+        ];
+        const ctx = createContext(command.parent!.parent!.opts());
+        const issueId = await resolveIssueId(ctx.sdk, issue);
+        const result = await getIssueDescriptionHistory(ctx.gql, issueId);
+        outputSuccess(result);
+      }),
+    );
+
+  issues
     .command("create <title>")
     .description("create new issue")
     .option("--description <text>", "issue body")
@@ -530,6 +588,10 @@ export function setupIssuesCommands(program: Command): void {
     )
     .option("--title <text>", "new title")
     .option("--description <text>", "new description")
+    .option(
+      "--description-from-history <version-id>",
+      "revert description to a prior version (id from `issues description-history`)",
+    )
     .option("--status <status>", "new status")
     .option("--priority <1-4>", "new priority")
     .option("--assignee <user>", "new assignee")
@@ -562,6 +624,12 @@ export function setupIssuesCommands(program: Command): void {
         if (options.parentTicket && options.clearParentTicket) {
           throw new Error(
             "Cannot use --parent-ticket and --clear-parent-ticket together",
+          );
+        }
+
+        if (options.description && options.descriptionFromHistory) {
+          throw new Error(
+            "Cannot use --description and --description-from-history together",
           );
         }
 
@@ -629,6 +697,20 @@ export function setupIssuesCommands(program: Command): void {
 
         if (options.description) {
           input.description = options.description;
+        }
+
+        if (options.descriptionFromHistory) {
+          const entry = await getIssueDescriptionHistoryEntry(
+            ctx.gql,
+            resolvedIssueId,
+            options.descriptionFromHistory,
+          );
+          if (!entry.contentData) {
+            throw new Error(
+              `Description history entry "${options.descriptionFromHistory}" has no contentData`,
+            );
+          }
+          input.descriptionData = entry.contentData;
         }
 
         if (options.status) {

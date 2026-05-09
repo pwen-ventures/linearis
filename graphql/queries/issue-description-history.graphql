@@ -1,0 +1,25 @@
+# Description (document content) history for an issue.
+#
+# Linear stores per-edit ProseMirror snapshots of an issue's description.
+# `documentContent` is the JSON form (`contentData`); the issue's plain
+# `description` field is a server-side markdown rendering of the latest
+# state. Reverting an issue's description is done by passing a historical
+# `contentData` payload back through `issueUpdate(input: { descriptionData })`.
+
+fragment DocumentContentHistoryFields on DocumentContentHistoryType {
+  id
+  createdAt
+  contentDataSnapshotAt
+  actorIds
+  contentData
+  metadata
+}
+
+query GetIssueDescriptionHistory($id: String!) {
+  documentContentHistory(id: $id) {
+    success
+    history {
+      ...DocumentContentHistoryFields
+    }
+  }
+}

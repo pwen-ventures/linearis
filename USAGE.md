@@ -59,14 +59,16 @@ relationships and issue relations (blocks, blocked-by, relates-to,
 duplicate-of) are supported.
 
 commands:
-  list [options]       list issues with optional filters
-  search <query>       full-text search issues
-  read <issue>         get full issue details including description
-  create <title>       create new issue
-  update <issue>       update an existing issue
-  subscribers <issue>  list users subscribed to an issue
-  subscribe <issue>    subscribe a user to an issue (defaults to current viewer)
-  unsubscribe <issue>  unsubscribe a user from an issue (defaults to current viewer)
+  list [options]               list issues with optional filters
+  search <query>               full-text search issues
+  read <issue>                 get full issue details including description
+  history <issue>              list state transitions and field changes for an issue
+  description-history <issue>  list historical description snapshots for an issue
+  create <title>               create new issue
+  update <issue>               update an existing issue
+  subscribers <issue>          list users subscribed to an issue
+  subscribe <issue>            subscribe a user to an issue (defaults to current viewer)
+  unsubscribe <issue>          unsubscribe a user from an issue (defaults to current viewer)
 
 arguments:
   <issue>  issue identifier (UUID or ABC-123)
@@ -127,6 +129,10 @@ search options:
 read options:
   --with-attachments  include issue attachments
 
+history options:
+  --limit <n>       max entries (default: 25)
+  --after <cursor>  cursor for next page
+
 create options:
   --description <text>      issue body
   --assignee <user>         assign to user
@@ -146,30 +152,31 @@ create options:
   --duplicate-of <issue>    this issue duplicates <issue>
 
 update options:
-  --title <text>             new title
-  --description <text>       new description
-  --status <status>          new status
-  --priority <1-4>           new priority
-  --assignee <user>          new assignee
-  --project <project>        new project
-  --labels <labels>          labels to apply (comma-separated)
-  --label-mode <mode>        add | overwrite
-  --clear-labels             remove all labels
-  --parent-ticket <issue>    set parent issue
-  --clear-parent-ticket      clear parent
-  --project-milestone <ms>   set project milestone
-  --clear-project-milestone  clear project milestone
-  --cycle <cycle>            set cycle
-  --clear-cycle              clear cycle
-  --estimate <n>             new estimate
-  --clear-estimate           clear estimate
-  --due-date <date>          set due date (YYYY-MM-DD)
-  --clear-due-date           clear due date
-  --blocks <issue>           add blocks relation
-  --blocked-by <issue>       add blocked-by relation
-  --relates-to <issue>       add relates-to relation
-  --duplicate-of <issue>     add duplicate relation
-  --remove-relation <issue>  remove relation with <issue>
+  --title <text>                           new title
+  --description <text>                     new description
+  --description-from-history <version-id>  revert description to a prior version (id from `issues description-history`)
+  --status <status>                        new status
+  --priority <1-4>                         new priority
+  --assignee <user>                        new assignee
+  --project <project>                      new project
+  --labels <labels>                        labels to apply (comma-separated)
+  --label-mode <mode>                      add | overwrite
+  --clear-labels                           remove all labels
+  --parent-ticket <issue>                  set parent issue
+  --clear-parent-ticket                    clear parent
+  --project-milestone <ms>                 set project milestone
+  --clear-project-milestone                clear project milestone
+  --cycle <cycle>                          set cycle
+  --clear-cycle                            clear cycle
+  --estimate <n>                           new estimate
+  --clear-estimate                         clear estimate
+  --due-date <date>                        set due date (YYYY-MM-DD)
+  --clear-due-date                         clear due date
+  --blocks <issue>                         add blocks relation
+  --blocked-by <issue>                     add blocked-by relation
+  --relates-to <issue>                     add relates-to relation
+  --duplicate-of <issue>                   add duplicate relation
+  --remove-relation <issue>                remove relation with <issue>
 
 subscribe options:
   --user <user>  user to subscribe (name, email, or UUID); defaults to viewer
@@ -177,7 +184,7 @@ subscribe options:
 unsubscribe options:
   --user <user>  user to unsubscribe (name, email, or UUID); defaults to viewer
 
-see also: comments create <issue>, documents list --issue <issue>, attachments list <issue>, issues read --with-attachments, issues subscribe <issue>, issues subscribers <issue>
+see also: comments create <issue>, documents list --issue <issue>, attachments list <issue>, issues read --with-attachments, issues subscribe <issue>, issues subscribers <issue>, issues history <issue>, issues description-history <issue>, issues update <issue> --description-from-history <version-id>
 
 ---
 

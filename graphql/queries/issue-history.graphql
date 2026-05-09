@@ -1,0 +1,231 @@
+# Issue history (state transitions and field changes)
+#
+# Linear records every meaningful change to an issue (status, assignee,
+# title, description-touched flag, labels, cycle, project, priority, etc.)
+# as an IssueHistory node. Consumers can scan these to determine, for
+# example, when an issue first transitioned to a given workflow state.
+
+fragment IssueHistoryFields on IssueHistory {
+  id
+  createdAt
+  updatedAt
+  archivedAt
+  archived
+  autoArchived
+  autoClosed
+  trashed
+  updatedDescription
+
+  actor {
+    id
+    name
+    displayName
+  }
+  actorId
+  botActor {
+    id
+    name
+    type
+    subType
+    userDisplayName
+  }
+
+  attachment {
+    id
+    title
+    url
+  }
+  attachmentId
+
+  addedLabelIds
+  addedLabels {
+    id
+    name
+    color
+  }
+  removedLabelIds
+  removedLabels {
+    id
+    name
+    color
+  }
+
+  addedToReleaseIds
+  addedToReleases {
+    id
+    name
+  }
+  removedFromReleaseIds
+  removedFromReleases {
+    id
+    name
+  }
+
+  descriptionUpdatedBy {
+    id
+    name
+    displayName
+  }
+
+  fromAssignee {
+    id
+    name
+    displayName
+  }
+  fromAssigneeId
+  toAssignee {
+    id
+    name
+    displayName
+  }
+  toAssigneeId
+
+  fromCycle {
+    id
+    name
+    number
+  }
+  fromCycleId
+  toCycle {
+    id
+    name
+    number
+  }
+  toCycleId
+
+  fromDelegate {
+    id
+    name
+    displayName
+  }
+  toDelegate {
+    id
+    name
+    displayName
+  }
+
+  fromDueDate
+  toDueDate
+
+  fromEstimate
+  toEstimate
+
+  fromParent {
+    id
+    identifier
+    title
+  }
+  fromParentId
+  toParent {
+    id
+    identifier
+    title
+  }
+  toParentId
+
+  fromPriority
+  toPriority
+
+  fromProject {
+    id
+    name
+  }
+  fromProjectId
+  toProject {
+    id
+    name
+  }
+  toProjectId
+
+  fromProjectMilestone {
+    id
+    name
+  }
+  toProjectMilestone {
+    id
+    name
+  }
+
+  fromSlaBreached
+  toSlaBreached
+  fromSlaBreachesAt
+  toSlaBreachesAt
+  fromSlaStartedAt
+  toSlaStartedAt
+  fromSlaType
+  toSlaType
+
+  fromState {
+    id
+    name
+    type
+  }
+  fromStateId
+  toState {
+    id
+    name
+    type
+  }
+  toStateId
+
+  fromTeam {
+    id
+    key
+    name
+  }
+  fromTeamId
+  toTeam {
+    id
+    key
+    name
+  }
+  toTeamId
+
+  fromTitle
+  toTitle
+
+  toConvertedProject {
+    id
+    name
+  }
+  toConvertedProjectId
+
+  triageResponsibilityAutoAssigned
+  triageResponsibilityNotifiedUsers {
+    id
+    name
+    displayName
+  }
+  triageResponsibilityTeam {
+    id
+    key
+    name
+  }
+
+  relationChanges {
+    type
+    identifier
+  }
+
+  issueImport {
+    id
+  }
+}
+
+# Paginated history for a single issue.
+#
+# Returns history entries newest-first by default (Linear's default order).
+query GetIssueHistory($id: String!, $first: Int, $after: String) {
+  issue(id: $id) {
+    id
+    history(first: $first, after: $after) {
+      nodes {
+        ...IssueHistoryFields
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+}
