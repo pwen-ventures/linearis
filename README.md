@@ -66,8 +66,16 @@ git add src/gql dist USAGE.md
 git commit -m "chore: rebuild dist"
 git push
 
-# 6. Reinstall globally to pick up the new build
-npm install -g github:pwen-ventures/linearis
+# 6. Reinstall globally to pick up the new build.
+#    npm's git-dependency resolver drops source files for this repo
+#    (see the warning above), so reinstall via clone+pack — the same
+#    method used by the initial install above.
+npm uninstall -g linearis
+TMPD=$(mktemp -d)
+git clone git@github.com:pwen-ventures/linearis.git "$TMPD/linearis"
+cd "$TMPD/linearis"
+npm pack --silent
+npm install -g "$TMPD/linearis/linearis-"*.tgz
 ```
 
 **Tip:** If you forget to rebuild before pushing, the installed CLI will run stale code even though the source in git is up to date. Consider adding a pre-push hook or a release checklist.
