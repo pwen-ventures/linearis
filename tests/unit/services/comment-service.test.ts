@@ -5,6 +5,8 @@ import {
   deleteComment,
   listComments,
   replyToComment,
+  resolveComment,
+  unresolveComment,
   updateComment,
 } from "../../../src/services/comment-service.js";
 
@@ -285,6 +287,110 @@ describe("updateComment", () => {
     await expect(
       updateComment(client, "comment-1", { body: "new" }),
     ).rejects.toThrow("Failed to update comment");
+  });
+});
+
+describe("resolveComment", () => {
+  it("resolves a thread and returns the comment with resolution fields", async () => {
+    const client = mockGqlClient({
+      commentResolve: {
+        success: true,
+        comment: {
+          id: "comment-1",
+          body: "Root comment",
+          createdAt: "2025-01-15T10:00:00.000Z",
+          editedAt: null,
+          parentId: null,
+          resolvedAt: "2025-01-15T15:00:00.000Z",
+          resolvingUser: MOCK_USER,
+          resolvingComment: { id: "reply-9" },
+          user: MOCK_USER,
+        },
+      },
+    });
+
+    const result = await resolveComment(client, "comment-1", "reply-9");
+
+    expect(result.resolvedAt).toBe("2025-01-15T15:00:00.000Z");
+    expect(result.resolvingComment).toEqual({ id: "reply-9" });
+    expect(client.request).toHaveBeenCalledWith(expect.anything(), {
+      id: "comment-1",
+      resolvingCommentId: "reply-9",
+    });
+  });
+
+  it("resolves without a resolving-comment hint", async () => {
+    const client = mockGqlClient({
+      commentResolve: {
+        success: true,
+        comment: {
+          id: "comment-1",
+          body: "Root comment",
+          createdAt: "2025-01-15T10:00:00.000Z",
+          editedAt: null,
+          parentId: null,
+          resolvedAt: "2025-01-15T15:00:00.000Z",
+          resolvingUser: MOCK_USER,
+          resolvingComment: null,
+          user: MOCK_USER,
+        },
+      },
+    });
+
+    await resolveComment(client, "comment-1");
+
+    expect(client.request).toHaveBeenCalledWith(expect.anything(), {
+      id: "comment-1",
+      resolvingCommentId: undefined,
+    });
+  });
+
+  it("throws when resolve fails", async () => {
+    const client = mockGqlClient({
+      commentResolve: { success: false, comment: null },
+    });
+
+    await expect(resolveComment(client, "comment-1")).rejects.toThrow(
+      "Failed to resolve comment",
+    );
+  });
+});
+
+describe("unresolveComment", () => {
+  it("unresolves a thread and clears the resolution fields", async () => {
+    const client = mockGqlClient({
+      commentUnresolve: {
+        success: true,
+        comment: {
+          id: "comment-1",
+          body: "Root comment",
+          createdAt: "2025-01-15T10:00:00.000Z",
+          editedAt: null,
+          parentId: null,
+          resolvedAt: null,
+          resolvingUser: null,
+          resolvingComment: null,
+          user: MOCK_USER,
+        },
+      },
+    });
+
+    const result = await unresolveComment(client, "comment-1");
+
+    expect(result.resolvedAt).toBeNull();
+    expect(client.request).toHaveBeenCalledWith(expect.anything(), {
+      id: "comment-1",
+    });
+  });
+
+  it("throws when unresolve fails", async () => {
+    const client = mockGqlClient({
+      commentUnresolve: { success: false, comment: null },
+    });
+
+    await expect(unresolveComment(client, "comment-1")).rejects.toThrow(
+      "Failed to unresolve comment",
+    );
   });
 });
 

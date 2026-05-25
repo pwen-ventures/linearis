@@ -21,6 +21,7 @@ import type {
   ListCommentsQuery,
   ListDocumentsQuery,
   ListProjectMilestonesQuery,
+  ResolveCommentMutation,
   SearchIssuesQuery,
   UpdateCommentMutation,
   UpdateIssueMutation,
@@ -108,6 +109,9 @@ export type UpdatedComment = NonNullable<
 >;
 export type CommentListItem =
   ListCommentsQuery["issue"]["comments"]["nodes"][0];
+export type ResolvedComment = NonNullable<
+  ResolveCommentMutation["commentResolve"]["comment"]
+>;
 
 // Viewer types
 export type Viewer = GetViewerQuery["viewer"];

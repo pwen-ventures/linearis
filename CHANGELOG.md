@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file. The format 
 
 ## [Unreleased]
 
+### Added
+
+- **Resolve/unresolve comment threads** — `linearis comments resolve <comment-uuid>` (with optional `--resolving-comment <uuid>`) and `linearis comments unresolve <comment-uuid>` wrap the Linear `commentResolve` / `commentUnresolve` mutations. Only top-level (thread root) comment UUIDs are accepted. The `CommentFields` fragment now also returns `resolvedAt`, `resolvingUser`, and `resolvingComment` on every comment-shaped response.
+
 ---
 
 ## [2026.4.4] - 2026-04-09

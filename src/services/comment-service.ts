@@ -5,6 +5,7 @@ import type {
   CreatedComment,
   PaginatedResult,
   PaginationOptions,
+  ResolvedComment,
   UpdatedComment,
 } from "../common/types.js";
 import {
@@ -16,6 +17,10 @@ import {
   type DeleteCommentMutation,
   ListCommentsDocument,
   type ListCommentsQuery,
+  ResolveCommentDocument,
+  type ResolveCommentMutation,
+  UnresolveCommentDocument,
+  type UnresolveCommentMutation,
   UpdateCommentDocument,
   type UpdateCommentMutation,
 } from "../gql/graphql.js";
@@ -104,6 +109,39 @@ export async function replyToComment(
   }
 
   return result.commentCreate.comment;
+}
+
+export async function resolveComment(
+  client: GraphQLClient,
+  id: string,
+  resolvingCommentId?: string,
+): Promise<ResolvedComment> {
+  const result = await client.request<ResolveCommentMutation>(
+    ResolveCommentDocument,
+    { id, resolvingCommentId },
+  );
+
+  if (!result.commentResolve.success || !result.commentResolve.comment) {
+    throw new Error("Failed to resolve comment");
+  }
+
+  return result.commentResolve.comment;
+}
+
+export async function unresolveComment(
+  client: GraphQLClient,
+  id: string,
+): Promise<ResolvedComment> {
+  const result = await client.request<UnresolveCommentMutation>(
+    UnresolveCommentDocument,
+    { id },
+  );
+
+  if (!result.commentUnresolve.success || !result.commentUnresolve.comment) {
+    throw new Error("Failed to unresolve comment");
+  }
+
+  return result.commentUnresolve.comment;
 }
 
 export async function deleteComment(

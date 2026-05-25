@@ -6,7 +6,7 @@ ids: UUID or human-readable (team key, issue ABC-123, name)
 domains:
   auth          authenticate with Linear API (interactive, for humans)
   issues        work items with status, priority, assignee, labels
-  comments      discussion threads on issues (list, create, reply, edit, delete)
+  comments      discussion threads on issues (list, create, reply, edit, resolve, unresolve, delete)
   labels        categorization tags, workspace-wide or team-scoped
   projects      groups of issues toward a goal
   cycles        time-boxed iterations (sprints) per team
@@ -188,16 +188,18 @@ see also: comments create <issue>, documents list --issue <issue>, attachments l
 
 ---
 
-linearis comments — discussion threads on issues (list, create, reply, edit, delete)
+linearis comments — discussion threads on issues (list, create, reply, edit, resolve, unresolve, delete)
 
 a comment is a text entry on an issue. comments support markdown and threaded replies via parentId.
 
 commands:
-  list <issue>      list comments on an issue
-  create <issue>    create a comment on an issue
-  reply <comment>   reply to a comment (threaded)
-  edit <comment>    edit a comment
-  delete <comment>  delete a comment
+  list <issue>         list comments on an issue
+  create <issue>       create a comment on an issue
+  reply <comment>      reply to a comment (threaded)
+  edit <comment>       edit a comment
+  resolve <comment>    resolve a comment thread (top-level comment UUID only)
+  unresolve <comment>  unresolve a previously resolved comment thread
+  delete <comment>     delete a comment
 
 arguments:
   <issue>    issue identifier (UUID or ABC-123)
@@ -216,6 +218,9 @@ reply options:
 
 edit options:
   --body <text>  new comment body (required, markdown supported)
+
+resolve options:
+  --resolving-comment <uuid>  UUID of the child reply that constitutes the resolution
 
 see also: issues read <issue>
 

@@ -8,6 +8,8 @@ import {
   deleteComment,
   listComments,
   replyToComment,
+  resolveComment,
+  unresolveComment,
   updateComment,
 } from "../services/comment-service.js";
 
@@ -29,9 +31,14 @@ interface EditCommentOptions extends CommandOptions {
   body?: string;
 }
 
+interface ResolveCommentOptions extends CommandOptions {
+  resolvingComment?: string;
+}
+
 export const COMMENTS_META: DomainMeta = {
   name: "comments",
-  summary: "discussion threads on issues (list, create, reply, edit, delete)",
+  summary:
+    "discussion threads on issues (list, create, reply, edit, resolve, unresolve, delete)",
   context:
     "a comment is a text entry on an issue. comments support markdown and threaded replies via parentId.",
   arguments: {
@@ -171,6 +178,46 @@ export function setupCommentsCommands(program: Command): void {
         const result = await updateComment(ctx.gql, comment, {
           body: options.body,
         });
+
+        outputSuccess(result);
+      }),
+    );
+
+  comments
+    .command("resolve <comment>")
+    .description("resolve a comment thread (top-level comment UUID only)")
+    .option(
+      "--resolving-comment <uuid>",
+      "UUID of the child reply that constitutes the resolution",
+    )
+    .action(
+      handleCommand(async (...args: unknown[]) => {
+        const [comment, options, command] = args as [
+          string,
+          ResolveCommentOptions,
+          Command,
+        ];
+        const ctx = createContext(command.parent!.parent!.opts());
+
+        const result = await resolveComment(
+          ctx.gql,
+          comment,
+          options.resolvingComment,
+        );
+
+        outputSuccess(result);
+      }),
+    );
+
+  comments
+    .command("unresolve <comment>")
+    .description("unresolve a previously resolved comment thread")
+    .action(
+      handleCommand(async (...args: unknown[]) => {
+        const [comment, , command] = args as [string, unknown, Command];
+        const ctx = createContext(command.parent!.parent!.opts());
+
+        const result = await unresolveComment(ctx.gql, comment);
 
         outputSuccess(result);
       }),

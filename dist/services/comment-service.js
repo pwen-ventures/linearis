@@ -1,5 +1,5 @@
 import { applyActorOverrides } from "../common/actor.js";
-import { CreateCommentDocument, DeleteCommentDocument, ListCommentsDocument, UpdateCommentDocument, } from "../gql/graphql.js";
+import { CreateCommentDocument, DeleteCommentDocument, ListCommentsDocument, ResolveCommentDocument, UnresolveCommentDocument, UpdateCommentDocument, } from "../gql/graphql.js";
 export async function createComment(client, input, actorOverrides) {
     const result = await client.request(CreateCommentDocument, { input: applyActorOverrides(input, actorOverrides) });
     if (!result.commentCreate.success || !result.commentCreate.comment) {
@@ -44,6 +44,20 @@ export async function replyToComment(client, input, actorOverrides) {
         throw new Error("Failed to create reply");
     }
     return result.commentCreate.comment;
+}
+export async function resolveComment(client, id, resolvingCommentId) {
+    const result = await client.request(ResolveCommentDocument, { id, resolvingCommentId });
+    if (!result.commentResolve.success || !result.commentResolve.comment) {
+        throw new Error("Failed to resolve comment");
+    }
+    return result.commentResolve.comment;
+}
+export async function unresolveComment(client, id) {
+    const result = await client.request(UnresolveCommentDocument, { id });
+    if (!result.commentUnresolve.success || !result.commentUnresolve.comment) {
+        throw new Error("Failed to unresolve comment");
+    }
+    return result.commentUnresolve.comment;
 }
 export async function deleteComment(client, id) {
     const result = await client.request(DeleteCommentDocument, { id });

@@ -17,6 +17,14 @@ fragment CommentFields on Comment {
   createdAt
   editedAt
   parentId
+  resolvedAt
+  resolvingUser {
+    id
+    displayName
+  }
+  resolvingComment {
+    id
+  }
   user {
     id
     displayName
@@ -59,6 +67,46 @@ mutation CreateComment($input: CommentCreateInput!) {
 # Returns: success flag and the updated comment with its fields
 mutation UpdateComment($id: String!, $input: CommentUpdateInput!) {
   commentUpdate(id: $id, input: $input) {
+    success
+    comment {
+      ...CommentFields
+    }
+  }
+}
+
+# Resolve a comment thread
+#
+# Marks the root comment as resolved by the current user, collapsing
+# the thread in the Linear UI. Only top-level comments (thread roots)
+# can be resolved — passing a reply UUID will fail.
+#
+# Variables:
+#   id: UUID of the top-level comment to resolve (required)
+#   resolvingCommentId: UUID of the child reply that constitutes the
+#                       resolution (optional; surfaced in the UI as the
+#                       "resolved by" reply)
+#
+# Returns: success flag and the updated comment with resolution fields
+mutation ResolveComment($id: String!, $resolvingCommentId: String) {
+  commentResolve(id: $id, resolvingCommentId: $resolvingCommentId) {
+    success
+    comment {
+      ...CommentFields
+    }
+  }
+}
+
+# Unresolve a previously resolved comment thread
+#
+# Clears the resolved state on the root comment, re-opening the thread
+# in the Linear UI.
+#
+# Variables:
+#   id: UUID of the top-level comment to unresolve (required)
+#
+# Returns: success flag and the updated comment
+mutation UnresolveComment($id: String!) {
+  commentUnresolve(id: $id) {
     success
     comment {
       ...CommentFields
