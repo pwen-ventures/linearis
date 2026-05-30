@@ -1,5 +1,6 @@
 // tests/unit/common/output.test.ts
-import { describe, expect, it, vi } from "vitest";
+import * as fs from "node:fs";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AuthenticationError } from "../../../src/common/errors.js";
 import {
   handleCommand,
@@ -8,46 +9,67 @@ import {
   outputSuccess,
   parseLimit,
 } from "../../../src/common/output.js";
+import { fdOutput } from "../helpers/output-capture.js";
+
+// outputSuccess/outputError write straight to fd 1/2 via fs.writeSync — mock it
+// so the bytes are captured instead of hitting the real descriptors.
+vi.mock("node:fs", () => {
+  const writeSync = vi.fn(
+    (_fd: number, buf: Buffer, _offset?: number, length?: number) =>
+      length ?? buf.length,
+  );
+  return { writeSync, default: { writeSync } };
+});
+
+const writeSync = vi.mocked(fs.writeSync);
 
 describe("outputSuccess", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("writes JSON to stdout and exits with code 0", () => {
-    const spy = vi.spyOn(console, "log").mockImplementation(() => {});
     const exitSpy = vi
       .spyOn(process, "exit")
       .mockImplementation(() => undefined as never);
 
     outputSuccess({ id: "123", title: "Test" });
 
-    expect(spy).toHaveBeenCalledWith(
+    expect(fdOutput(writeSync, 1)).toContain(
       JSON.stringify({ id: "123", title: "Test" }, null, 2),
     );
     expect(exitSpy).toHaveBeenCalledWith(0);
 
-    spy.mockRestore();
     exitSpy.mockRestore();
   });
 });
 
 describe("outputError", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("writes error JSON to stderr and exits", () => {
-    const stderrSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const exitSpy = vi
       .spyOn(process, "exit")
       .mockImplementation(() => undefined as never);
 
     outputError(new Error("something failed"));
 
-    expect(stderrSpy).toHaveBeenCalledWith(
+    expect(fdOutput(writeSync, 2)).toContain(
       JSON.stringify({ error: "something failed" }, null, 2),
     );
     expect(exitSpy).toHaveBeenCalledWith(1);
 
-    stderrSpy.mockRestore();
     exitSpy.mockRestore();
   });
 });
 
 describe("handleCommand", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("calls the wrapped function", async () => {
     const fn = vi.fn().mockResolvedValue(undefined);
     const wrapped = handleCommand(fn);
@@ -56,27 +78,28 @@ describe("handleCommand", () => {
   });
 
   it("catches errors and outputs them", async () => {
-    const fn = vi.fn().mockRejectedValue(new Error("boom"));
-    const stderrSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const exitSpy = vi
       .spyOn(process, "exit")
       .mockImplementation(() => undefined as never);
+    const fn = vi.fn().mockRejectedValue(new Error("boom"));
 
     const wrapped = handleCommand(fn);
     await wrapped();
 
-    expect(stderrSpy).toHaveBeenCalledWith(
+    expect(fdOutput(writeSync, 2)).toContain(
       JSON.stringify({ error: "boom" }, null, 2),
     );
 
-    stderrSpy.mockRestore();
     exitSpy.mockRestore();
   });
 });
 
 describe("handleCommand with AuthenticationError", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("calls outputAuthError for AuthenticationError", async () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const exitSpy = vi
       .spyOn(process, "exit")
       .mockImplementation(() => undefined as never);
@@ -87,11 +110,10 @@ describe("handleCommand with AuthenticationError", () => {
 
     await handler();
 
-    const output = JSON.parse(consoleSpy.mock.calls[0][0] as string);
+    const output = JSON.parse(fdOutput(writeSync, 2));
     expect(output.error).toBe("AUTHENTICATION_REQUIRED");
     expect(exitSpy).toHaveBeenCalledWith(42);
 
-    consoleSpy.mockRestore();
     exitSpy.mockRestore();
   });
 });
@@ -119,8 +141,11 @@ describe("parseLimit", () => {
 });
 
 describe("outputAuthError", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("outputs structured JSON with AUTHENTICATION_REQUIRED", () => {
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const exitSpy = vi
       .spyOn(process, "exit")
       .mockImplementation(() => undefined as never);
@@ -128,7 +153,7 @@ describe("outputAuthError", () => {
     const err = new AuthenticationError("Token expired");
     outputAuthError(err);
 
-    const output = JSON.parse(consoleSpy.mock.calls[0][0] as string);
+    const output = JSON.parse(fdOutput(writeSync, 2));
     expect(output.error).toBe("AUTHENTICATION_REQUIRED");
     expect(output.message).toBe("Linear API authentication failed.");
     expect(output.details).toBe("Token expired");
@@ -137,7 +162,6 @@ describe("outputAuthError", () => {
     expect(output.exit_code).toBe(42);
     expect(exitSpy).toHaveBeenCalledWith(42);
 
-    consoleSpy.mockRestore();
     exitSpy.mockRestore();
   });
 });

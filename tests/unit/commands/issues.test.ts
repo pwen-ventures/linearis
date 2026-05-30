@@ -1,6 +1,18 @@
 // tests/unit/commands/issues.test.ts
+import * as fs from "node:fs";
 import { Command } from "commander";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fdOutput } from "../helpers/output-capture.js";
+
+// outputError writes to fd 2 via fs.writeSync, not console.error — capture it.
+vi.mock("node:fs", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:fs")>();
+  const writeSync = vi.fn(
+    (_fd: number, buf: Buffer, _offset?: number, length?: number) =>
+      length ?? buf.length,
+  );
+  return { ...actual, default: { ...actual, writeSync }, writeSync };
+});
 
 // Mock all external dependencies before importing the module under test
 vi.mock("../../../src/common/context.js", () => ({

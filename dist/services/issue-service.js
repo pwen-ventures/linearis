@@ -88,5 +88,11 @@ export async function updateIssue(client, id, input) {
     if (!result.issueUpdate.success || !result.issueUpdate.issue) {
         throw new Error("Failed to update issue");
     }
-    return result.issueUpdate.issue;
+    const issue = result.issueUpdate.issue;
+    if (input.assigneeId != null && issue.assignee?.id !== input.assigneeId) {
+        throw new Error(`Issue updated but the assignee was not applied (requested ${input.assigneeId}, ` +
+            `got ${issue.assignee?.id ?? "null"}). ` +
+            `The user is likely not assignable on this issue's team.`);
+    }
+    return issue;
 }

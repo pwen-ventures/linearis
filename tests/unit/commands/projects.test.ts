@@ -1,5 +1,17 @@
+import * as fs from "node:fs";
 import { Command } from "commander";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fdOutput } from "../helpers/output-capture.js";
+
+// outputError writes to fd 2 via fs.writeSync, not console.error — capture it.
+vi.mock("node:fs", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:fs")>();
+  const writeSync = vi.fn(
+    (_fd: number, buf: Buffer, _offset?: number, length?: number) =>
+      length ?? buf.length,
+  );
+  return { ...actual, default: { ...actual, writeSync }, writeSync };
+});
 
 vi.mock("../../../src/common/context.js", () => ({
   createContext: vi.fn(() => ({
@@ -149,9 +161,7 @@ describe("projects create --priority", () => {
       "5",
     ]);
 
-    expect(console.error).toHaveBeenCalledWith(
-      expect.stringContaining("must be 0-4"),
-    );
+    expect(fdOutput(vi.mocked(fs.writeSync), 2)).toContain("must be 0-4");
     expect(createProject).not.toHaveBeenCalled();
   });
 
@@ -169,9 +179,7 @@ describe("projects create --priority", () => {
       "abc",
     ]);
 
-    expect(console.error).toHaveBeenCalledWith(
-      expect.stringContaining("must be 0-4"),
-    );
+    expect(fdOutput(vi.mocked(fs.writeSync), 2)).toContain("must be 0-4");
     expect(createProject).not.toHaveBeenCalled();
   });
 });
@@ -194,8 +202,8 @@ describe("projects update", () => {
       "My Project",
     ]);
 
-    expect(console.error).toHaveBeenCalledWith(
-      expect.stringContaining("at least one option must be provided"),
+    expect(fdOutput(vi.mocked(fs.writeSync), 2)).toContain(
+      "at least one option must be provided",
     );
     expect(updateProject).not.toHaveBeenCalled();
   });

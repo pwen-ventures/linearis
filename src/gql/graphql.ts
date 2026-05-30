@@ -773,6 +773,7 @@ export enum AiConversationEntityCardWidgetArgsType {
   CustomerNeed = 'CustomerNeed',
   Dashboard = 'Dashboard',
   Document = 'Document',
+  Draft = 'Draft',
   Initiative = 'Initiative',
   InitiativeUpdate = 'InitiativeUpdate',
   Issue = 'Issue',
@@ -781,6 +782,7 @@ export enum AiConversationEntityCardWidgetArgsType {
   ProjectUpdate = 'ProjectUpdate',
   PullRequest = 'PullRequest',
   Release = 'Release',
+  ReleaseNote = 'ReleaseNote',
   ReleasePipeline = 'ReleasePipeline',
   Team = 'Team',
   Template = 'Template',
@@ -843,6 +845,7 @@ export enum AiConversationEntityListWidgetArgsEntitiesType {
   ProjectUpdate = 'ProjectUpdate',
   PullRequest = 'PullRequest',
   Release = 'Release',
+  ReleaseNote = 'ReleaseNote',
   ReleasePipeline = 'ReleasePipeline',
   Team = 'Team',
   Template = 'Template',
@@ -1020,6 +1023,39 @@ export type AiConversationInvokeMcpToolToolCallArgsTool = {
   title?: Maybe<Scalars['String']['output']>;
 };
 
+export type AiConversationListCodingSessionsToolCall = AiConversationBaseToolCall & {
+  __typename?: 'AiConversationListCodingSessionsToolCall';
+  /** The arguments to the tool call. */
+  args?: Maybe<AiConversationListCodingSessionsToolCallArgs>;
+  displayInfo: AiConversationToolDisplayInfo;
+  /** The name of the tool that was called. */
+  name: AiConversationTool;
+  /** The arguments of the tool call. */
+  rawArgs?: Maybe<Scalars['JSON']['output']>;
+  /** The result of the tool call. */
+  rawResult?: Maybe<Scalars['JSON']['output']>;
+  /** The result of the tool call. */
+  result?: Maybe<AiConversationListCodingSessionsToolCallResult>;
+};
+
+export type AiConversationListCodingSessionsToolCallArgs = {
+  __typename?: 'AiConversationListCodingSessionsToolCallArgs';
+  includeDismissed?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type AiConversationListCodingSessionsToolCallResult = {
+  __typename?: 'AiConversationListCodingSessionsToolCallResult';
+  agentSessions: Array<AiConversationListCodingSessionsToolCallResultAgentSessions>;
+  entities?: Maybe<Array<AiConversationSearchEntitiesToolCallResultEntities>>;
+};
+
+export type AiConversationListCodingSessionsToolCallResultAgentSessions = {
+  __typename?: 'AiConversationListCodingSessionsToolCallResultAgentSessions';
+  id: Scalars['String']['output'];
+  pullRequests?: Maybe<Array<AiConversationSearchEntitiesToolCallResultEntities>>;
+  type: Scalars['String']['output'];
+};
+
 export type AiConversationNavigateToPageToolCall = AiConversationBaseToolCall & {
   __typename?: 'AiConversationNavigateToPageToolCall';
   /** The arguments to the tool call. */
@@ -1088,6 +1124,34 @@ export enum AiConversationPartType {
   Widget = 'widget',
   WidgetPlaceholder = 'widgetPlaceholder'
 }
+
+export type AiConversationPromptCodingSessionToolCall = AiConversationBaseToolCall & {
+  __typename?: 'AiConversationPromptCodingSessionToolCall';
+  /** The arguments to the tool call. */
+  args?: Maybe<AiConversationPromptCodingSessionToolCallArgs>;
+  displayInfo: AiConversationToolDisplayInfo;
+  /** The name of the tool that was called. */
+  name: AiConversationTool;
+  /** The arguments of the tool call. */
+  rawArgs?: Maybe<Scalars['JSON']['output']>;
+  /** The result of the tool call. */
+  rawResult?: Maybe<Scalars['JSON']['output']>;
+  /** The result of the tool call. */
+  result?: Maybe<AiConversationPromptCodingSessionToolCallResult>;
+};
+
+export type AiConversationPromptCodingSessionToolCallArgs = {
+  __typename?: 'AiConversationPromptCodingSessionToolCallArgs';
+  agentSessionId: Scalars['String']['output'];
+  prompt: Scalars['String']['output'];
+};
+
+export type AiConversationPromptCodingSessionToolCallResult = {
+  __typename?: 'AiConversationPromptCodingSessionToolCallResult';
+  agentSession: AiConversationSearchEntitiesToolCallResultEntities;
+  entities?: Maybe<Array<AiConversationSearchEntitiesToolCallResultEntities>>;
+  pullRequests?: Maybe<Array<AiConversationSearchEntitiesToolCallResultEntities>>;
+};
 
 /** A prompt part in an AI conversation. */
 export type AiConversationPromptPart = AiConversationBasePart & {
@@ -1341,6 +1405,33 @@ export type AiConversationSearchEntitiesToolCallResultEntities = {
   type: Scalars['String']['output'];
 };
 
+export type AiConversationStartCodingSessionToolCall = AiConversationBaseToolCall & {
+  __typename?: 'AiConversationStartCodingSessionToolCall';
+  /** The arguments to the tool call. */
+  args?: Maybe<AiConversationStartCodingSessionToolCallArgs>;
+  displayInfo: AiConversationToolDisplayInfo;
+  /** The name of the tool that was called. */
+  name: AiConversationTool;
+  /** The arguments of the tool call. */
+  rawArgs?: Maybe<Scalars['JSON']['output']>;
+  /** The result of the tool call. */
+  rawResult?: Maybe<Scalars['JSON']['output']>;
+  /** The result of the tool call. */
+  result?: Maybe<AiConversationStartCodingSessionToolCallResult>;
+};
+
+export type AiConversationStartCodingSessionToolCallArgs = {
+  __typename?: 'AiConversationStartCodingSessionToolCallArgs';
+  prompt: Scalars['String']['output'];
+};
+
+export type AiConversationStartCodingSessionToolCallResult = {
+  __typename?: 'AiConversationStartCodingSessionToolCallResult';
+  agentSession: AiConversationSearchEntitiesToolCallResultEntities;
+  entities?: Maybe<Array<AiConversationSearchEntitiesToolCallResultEntities>>;
+  pullRequests?: Maybe<Array<AiConversationSearchEntitiesToolCallResultEntities>>;
+};
+
 /** The status of an AI conversation. */
 export enum AiConversationStatus {
   Active = 'active',
@@ -1442,7 +1533,9 @@ export enum AiConversationTool {
   GetSlackConversationHistory = 'GetSlackConversationHistory',
   HandoffToCodingSession = 'HandoffToCodingSession',
   InvokeMcpTool = 'InvokeMcpTool',
+  ListCodingSessions = 'ListCodingSessions',
   NavigateToPage = 'NavigateToPage',
+  PromptCodingSession = 'PromptCodingSession',
   QueryActivity = 'QueryActivity',
   QueryUpdates = 'QueryUpdates',
   QueryView = 'QueryView',
@@ -1453,6 +1546,7 @@ export enum AiConversationTool {
   RetryPullRequestCheck = 'RetryPullRequestCheck',
   SearchDocumentation = 'SearchDocumentation',
   SearchEntities = 'SearchEntities',
+  StartCodingSession = 'StartCodingSession',
   SubscribeToEvent = 'SubscribeToEvent',
   SuggestRepository = 'SuggestRepository',
   SuggestValues = 'SuggestValues',
@@ -1464,7 +1558,7 @@ export enum AiConversationTool {
 }
 
 /** The tool call. */
-export type AiConversationToolCall = AiConversationBashToolCall | AiConversationCodeIntelligenceToolCall | AiConversationCreateEntityToolCall | AiConversationCreateSandboxToolCall | AiConversationDeleteEntityToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationInvokeMcpToolToolCall | AiConversationNavigateToPageToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationQueryViewToolCall | AiConversationReadSandboxFileToolCall | AiConversationResearchToolCall | AiConversationRestoreEntityToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationSearchDocumentationToolCall | AiConversationSearchEntitiesToolCall | AiConversationSubscribeToEventToolCall | AiConversationSuggestRepositoryToolCall | AiConversationSuggestValuesToolCall | AiConversationTranscribeMediaToolCall | AiConversationTranscribeVideoToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationUpdateEntityToolCall | AiConversationWebSearchToolCall;
+export type AiConversationToolCall = AiConversationBashToolCall | AiConversationCodeIntelligenceToolCall | AiConversationCreateEntityToolCall | AiConversationCreateSandboxToolCall | AiConversationDeleteEntityToolCall | AiConversationGetMicrosoftTeamsConversationHistoryToolCall | AiConversationGetPullRequestCheckLogsToolCall | AiConversationGetPullRequestDiffToolCall | AiConversationGetPullRequestFileToolCall | AiConversationGetSlackConversationHistoryToolCall | AiConversationHandoffToCodingSessionToolCall | AiConversationInvokeMcpToolToolCall | AiConversationListCodingSessionsToolCall | AiConversationNavigateToPageToolCall | AiConversationPromptCodingSessionToolCall | AiConversationQueryActivityToolCall | AiConversationQueryUpdatesToolCall | AiConversationQueryViewToolCall | AiConversationReadSandboxFileToolCall | AiConversationResearchToolCall | AiConversationRestoreEntityToolCall | AiConversationRetrieveEntitiesToolCall | AiConversationRetryPullRequestCheckToolCall | AiConversationSearchDocumentationToolCall | AiConversationSearchEntitiesToolCall | AiConversationStartCodingSessionToolCall | AiConversationSubscribeToEventToolCall | AiConversationSuggestRepositoryToolCall | AiConversationSuggestValuesToolCall | AiConversationTranscribeMediaToolCall | AiConversationTranscribeVideoToolCall | AiConversationUnsubscribeFromEventToolCall | AiConversationUpdateEntityToolCall | AiConversationWebSearchToolCall;
 
 /** A tool call part in an AI conversation. */
 export type AiConversationToolCallPart = AiConversationBasePart & {
@@ -1789,6 +1883,27 @@ export type ArchiveResponse = {
   includesDependencies: Array<Scalars['String']['output']>;
   /** The total number of entities in the archive. */
   totalCount: Scalars['Float']['output'];
+};
+
+/** A recently archived integration. */
+export type ArchivedIntegrationPayload = {
+  __typename?: 'ArchivedIntegrationPayload';
+  /** The time at which the integration was archived. */
+  archivedAt: Scalars['DateTime']['output'];
+  /** Whether the integration had full code access. */
+  codeAccess?: Maybe<Scalars['Boolean']['output']>;
+  /** The enterprise URL if this is a GitHub Enterprise Cloud integration. */
+  enterpriseUrl?: Maybe<Scalars['String']['output']>;
+  /** The external identifier of the connected GitHub organization. */
+  externalOrgId?: Maybe<Scalars['String']['output']>;
+  /** The unique identifier of the integration. */
+  id: Scalars['String']['output'];
+  /** The avatar URL of the connected GitHub organization. */
+  orgAvatarUrl?: Maybe<Scalars['String']['output']>;
+  /** The login name of the connected GitHub organization. */
+  orgLogin?: Maybe<Scalars['String']['output']>;
+  /** The integration service type. */
+  service: Scalars['String']['output'];
 };
 
 export type AsksChannelConnectPayload = {
@@ -2659,6 +2774,10 @@ export type ContactSalesCreateInput = {
   sessionId?: InputMaybe<Scalars['String']['input']>;
   /** The page URL from which the sales inquiry was submitted, for attribution tracking. */
   url?: InputMaybe<Scalars['String']['input']>;
+  /** JSON serialized last-touch UTM parameters captured from the `utm` cookie at form submission. */
+  utm?: InputMaybe<Scalars['String']['input']>;
+  /** JSON serialized first-touch UTM parameters captured from the `utm_first` cookie at form submission. */
+  utmFirstTouch?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** [Internal] Comparator for content. */
@@ -2704,6 +2823,8 @@ export type CreateOrganizationInput = {
   urlKey: Scalars['String']['input'];
   /** JSON serialized UTM parameters associated with the creation of the workspace. */
   utm?: InputMaybe<Scalars['String']['input']>;
+  /** JSON serialized UTM parameters captured on the user's first visit to the marketing site (first-touch attribution). */
+  utmFirstTouch?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Issue creation date sorting options. */
@@ -6046,6 +6167,8 @@ export enum GitHubRemoveCodeAccessAction {
 export type GitHubRepoInput = {
   /** Whether the repository is archived. */
   archived?: InputMaybe<Scalars['Boolean']['input']>;
+  /** The repository's GitHub description, if any. */
+  description?: InputMaybe<Scalars['String']['input']>;
   /** The external identifier (GitHub node ID) for the repository. */
   externalId?: InputMaybe<Scalars['String']['input']>;
   /** The full name of the repository. */
@@ -6329,6 +6452,8 @@ export type Initiative = Node & {
   icon?: Maybe<Scalars['String']['output']>;
   /** The unique identifier of the entity. */
   id: Scalars['ID']['output'];
+  /** [Internal] The human-readable identifier of the initiative. Returns the custom identifier override when set, otherwise the workspace default `<prefix>-<number>`. Null for legacy initiatives that have not been backfilled. */
+  identifier?: Maybe<Scalars['String']['output']>;
   /** Initiative updates associated with the initiative. */
   initiativeUpdates: InitiativeUpdateConnection;
   /** Settings for all integrations associated with that initiative. */
@@ -6351,6 +6476,8 @@ export type Initiative = Node & {
   parentInitiative?: Maybe<Initiative>;
   /** [Internal] Parent initiatives associated with the initiative. */
   parentInitiatives: InitiativeConnection;
+  /** [Internal] Identifiers (default and custom) that this initiative has previously held. Used to resolve URLs that referenced an older identifier. */
+  previousIdentifiers: Array<Scalars['String']['output']>;
   /** Projects associated with the initiative. */
   projects: ProjectConnection;
   /** The initiative's unique URL slug, used to construct human-readable URLs. */
@@ -7151,7 +7278,7 @@ export type InitiativeUpdate = Node & {
   infoSnapshot?: Maybe<Scalars['JSONObject']['output']>;
   /** The initiative that this status update was posted to. */
   initiative: Initiative;
-  /** Whether the diff between this update and the previous one should be hidden in the UI. */
+  /** Whether the diff between this update and the previous one should be hidden in the UI. Only used for legacy updates. Not settable in the UI. */
   isDiffHidden: Scalars['Boolean']['output'];
   /** Whether the initiative update is stale. */
   isStale: Scalars['Boolean']['output'];
@@ -7258,6 +7385,8 @@ export type InitiativeUpdateInput = {
   color?: InputMaybe<Scalars['String']['input']>;
   /** The initiative's content in markdown format. */
   content?: InputMaybe<Scalars['String']['input']>;
+  /** [Internal] Sets or clears the custom identifier override for the initiative. Pass null to revert to the workspace default. */
+  customIdentifier?: InputMaybe<Scalars['String']['input']>;
   /** The description of the initiative. */
   description?: InputMaybe<Scalars['String']['input']>;
   /** The resolution type for the update reminder frequency (e.g., weekly, biweekly). */
@@ -7318,8 +7447,6 @@ export type InitiativeUpdateUpdateInput = {
   bodyData?: InputMaybe<Scalars['JSON']['input']>;
   /** The health of the initiative at the time of the update. */
   health?: InputMaybe<InitiativeUpdateHealthType>;
-  /** Whether the diff between the current update and the previous one should be hidden. */
-  isDiffHidden?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 /** Initiative update date sorting options. */
@@ -8224,6 +8351,8 @@ export type IssueCollectionFilter = {
   hasDismissedAgentSessions?: InputMaybe<RelationExistsComparator>;
   /** Comparator for filtering issues which are duplicates. */
   hasDuplicateRelations?: InputMaybe<RelationExistsComparator>;
+  /** [Internal] Comparator for filtering issues bucketed as having an errored agent session, no active sessions, and no merged agent pull requests. */
+  hasErroredAgentSessions?: InputMaybe<RelationExistsComparator>;
   /** [Internal] Comparator for filtering issues which have agent-session-linked pull requests that were merged. */
   hasMergedAgentPullRequests?: InputMaybe<RelationExistsComparator>;
   /** Comparator for filtering issues with relations. */
@@ -8542,6 +8671,8 @@ export type IssueFilter = {
   hasDismissedAgentSessions?: InputMaybe<RelationExistsComparator>;
   /** Comparator for filtering issues which are duplicates. */
   hasDuplicateRelations?: InputMaybe<RelationExistsComparator>;
+  /** [Internal] Comparator for filtering issues bucketed as having an errored agent session, no active sessions, and no merged agent pull requests. */
+  hasErroredAgentSessions?: InputMaybe<RelationExistsComparator>;
   /** [Internal] Comparator for filtering issues which have agent-session-linked pull requests that were merged. */
   hasMergedAgentPullRequests?: InputMaybe<RelationExistsComparator>;
   /** Comparator for filtering issues with relations. */
@@ -10819,6 +10950,8 @@ export type Mutation = {
   issueReminder: IssuePayload;
   /** Removes a label from an issue. */
   issueRemoveLabel: IssuePayload;
+  /** Shares an issue with a user who would not otherwise be able to access it. The viewer must have native access to the issue's full sub-issue tree and permission to share issues in the issue's team. Issues that inherit sharing from a parent issue cannot be shared directly. */
+  issueShare: IssuePayload;
   /** Subscribes a user to an issue. */
   issueSubscribe: IssuePayload;
   /** Creates a new association between an issue and a release, linking the issue to the release for tracking purposes. */
@@ -10829,6 +10962,8 @@ export type Mutation = {
   issueToReleaseDeleteByIssueAndRelease: DeletePayload;
   /** Unarchives an issue. */
   issueUnarchive: IssueArchivePayload;
+  /** Stops sharing an issue with a user. The viewer must have native access to the issue's full sub-issue tree and permission to share issues in the issue's team. Issues that inherit sharing from a parent issue cannot be unshared directly. */
+  issueUnshare: IssuePayload;
   /** Unsubscribes a user from an issue. */
   issueUnsubscribe: IssuePayload;
   /** Updates an issue. */
@@ -11017,8 +11152,8 @@ export type Mutation = {
   releasePipelineArchive: ReleasePipelineArchivePayload;
   /** Creates a new release pipeline with default stages. Subject to plan entitlement and quota limits. */
   releasePipelineCreate: ReleasePipelinePayload;
-  /** Permanently deletes a release pipeline and all associated stages and releases. */
-  releasePipelineDelete: DeletePayload;
+  /** Moves a release pipeline to the trash bin. Trashed pipelines are archived and will be permanently deleted after a retention period, along with all their releases. If the pipeline is already archived, it is marked as trashed with a fresh archive timestamp. */
+  releasePipelineDelete: ReleasePipelineArchivePayload;
   /** Unarchives a release pipeline. */
   releasePipelineUnarchive: ReleasePipelineArchivePayload;
   /** Updates an existing release pipeline. Supports updating name, slug, type, production flag, path patterns, and team associations. Private teams that the current user cannot access are preserved in the team list. */
@@ -11970,6 +12105,7 @@ export type MutationIntegrationLaunchDarklyPersonalConnectArgs = {
 
 export type MutationIntegrationMcpServerConnectArgs = {
   customHeaders?: InputMaybe<Array<McpServerCustomHeaderInput>>;
+  mcpServerDefinitionId?: InputMaybe<Scalars['String']['input']>;
   serverUrl: Scalars['String']['input'];
   teamId?: InputMaybe<Scalars['String']['input']>;
   workflowDefinitionDraftId?: InputMaybe<Scalars['String']['input']>;
@@ -11979,6 +12115,7 @@ export type MutationIntegrationMcpServerConnectArgs = {
 
 export type MutationIntegrationMcpServerPersonalConnectArgs = {
   customHeaders?: InputMaybe<Array<McpServerCustomHeaderInput>>;
+  mcpServerDefinitionId?: InputMaybe<Scalars['String']['input']>;
   serverUrl: Scalars['String']['input'];
 };
 
@@ -12348,6 +12485,12 @@ export type MutationIssueRemoveLabelArgs = {
 };
 
 
+export type MutationIssueShareArgs = {
+  id: Scalars['String']['input'];
+  userId: Scalars['String']['input'];
+};
+
+
 export type MutationIssueSubscribeArgs = {
   id: Scalars['String']['input'];
   userEmail?: InputMaybe<Scalars['String']['input']>;
@@ -12373,6 +12516,12 @@ export type MutationIssueToReleaseDeleteByIssueAndReleaseArgs = {
 
 export type MutationIssueUnarchiveArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type MutationIssueUnshareArgs = {
+  id: Scalars['String']['input'];
+  userId: Scalars['String']['input'];
 };
 
 
@@ -13825,6 +13974,8 @@ export type NullableDocumentContentFilter = {
   id?: InputMaybe<IdComparator>;
   /** Filters that the document content initiative must satisfy. */
   initiative?: InputMaybe<InitiativeFilter>;
+  /** Filters that the document content issue must satisfy. */
+  issue?: InputMaybe<IssueFilter>;
   /** Filter based on the existence of the relation. */
   null?: InputMaybe<Scalars['Boolean']['input']>;
   /** Compound filters, one of which need to be matched by the user. */
@@ -13967,6 +14118,8 @@ export type NullableIssueFilter = {
   hasDismissedAgentSessions?: InputMaybe<RelationExistsComparator>;
   /** Comparator for filtering issues which are duplicates. */
   hasDuplicateRelations?: InputMaybe<RelationExistsComparator>;
+  /** [Internal] Comparator for filtering issues bucketed as having an errored agent session, no active sessions, and no merged agent pull requests. */
+  hasErroredAgentSessions?: InputMaybe<RelationExistsComparator>;
   /** [Internal] Comparator for filtering issues which have agent-session-linked pull requests that were merged. */
   hasMergedAgentPullRequests?: InputMaybe<RelationExistsComparator>;
   /** Comparator for filtering issues with relations. */
@@ -14664,9 +14817,9 @@ export type Organization = Node & {
   codeIntelligenceEnabled: Scalars['Boolean']['output'];
   /** [INTERNAL] GitHub repository in owner/repo format for code intelligence. */
   codeIntelligenceRepository?: Maybe<Scalars['String']['output']>;
-  /** [INTERNAL] Whether the workspace has enabled the Coding Agent. */
+  /** [INTERNAL] Whether the workspace has enabled Coding Sessions. */
   codingAgentEnabled: Scalars['Boolean']['output'];
-  /** [Internal] Settings for Coding Agent features. */
+  /** [Internal] Settings for Coding Sessions features. */
   codingAgentSettings: Scalars['JSONObject']['output'];
   /** The time at which the entity was created. */
   createdAt: Scalars['DateTime']['output'];
@@ -14746,6 +14899,8 @@ export type Organization = Node & {
    * @deprecated Use organization.projectUpdatesReminderFrequencyInWeeks instead
    */
   projectUpdatesReminderFrequency: ProjectUpdateReminderFrequency;
+  /** Whether the workspace generates AI Pull Request guides for new pull requests. */
+  pullRequestTourEnabled: Scalars['Boolean']['output'];
   /** The feature release channel the workspace belongs to, which controls access to pre-release features. */
   releaseChannel: ReleaseChannel;
   /** Whether release management is enabled for the workspace. */
@@ -14910,9 +15065,9 @@ export type OrganizationCancelDeletePayload = {
   success: Scalars['Boolean']['output'];
 };
 
-/** [Internal] Input for updating Coding Agent settings for the workspace. */
+/** [Internal] Input for updating Coding Sessions settings for the workspace. */
 export type OrganizationCodingAgentSettingsInput = {
-  /** [Internal] The model preference used for Coding Agent sessions. */
+  /** [Internal] The model preference used for Coding Sessions sessions. */
   model?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -15262,9 +15417,9 @@ export type OrganizationUpdateInput = {
   codeIntelligenceEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   /** [INTERNAL] GitHub repository in owner/repo format for code intelligence. */
   codeIntelligenceRepository?: InputMaybe<Scalars['String']['input']>;
-  /** [INTERNAL] Whether the workspace has enabled the Coding Agent. */
+  /** [INTERNAL] Whether the workspace has enabled Coding Sessions. */
   codingAgentEnabled?: InputMaybe<Scalars['Boolean']['input']>;
-  /** [Internal] Settings for Coding Agent features. */
+  /** [Internal] Settings for Coding Sessions features. */
   codingAgentSettings?: InputMaybe<OrganizationCodingAgentSettingsInput>;
   /** [INTERNAL] Configuration settings for the Customers feature. */
   customersConfiguration?: InputMaybe<CustomersConfigurationInput>;
@@ -15314,6 +15469,8 @@ export type OrganizationUpdateInput = {
   projectUpdateRemindersDay?: InputMaybe<Day>;
   /** The hour at which project updates are sent. */
   projectUpdateRemindersHour?: InputMaybe<Scalars['Float']['input']>;
+  /** Whether the workspace generates AI Pull Request guides for new pull requests. */
+  pullRequestTourEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether the workspace has opted for reduced customer support attachment information. */
   reducedPersonalInformation?: InputMaybe<Scalars['Boolean']['input']>;
   /** Whether agent invocation is restricted to full workspace members. */
@@ -17748,8 +17905,6 @@ export type ProjectUpdateUpdateInput = {
   bodyData?: InputMaybe<Scalars['JSON']['input']>;
   /** The health of the project at the time of the update. */
   health?: InputMaybe<ProjectUpdateHealthType>;
-  /** Whether the diff between the current update and the previous one should be hidden. */
-  isDiffHidden?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 /** Project update date sorting options. */
@@ -17894,6 +18049,8 @@ export type PullRequestCommit = {
   isMergeCommit?: Maybe<Scalars['Boolean']['output']>;
   /** The full commit message. */
   message: Scalars['String']['output'];
+  /** The parent commit SHAs in provider-reported order. The first parent is used for merge-commit review ranges when available. */
+  parentShas?: Maybe<Array<Scalars['String']['output']>>;
   /** The Git commit SHA. */
   sha: Scalars['String']['output'];
 };
@@ -18085,6 +18242,8 @@ export type Query = {
   agentSessions: AgentSessionConnection;
   /** Retrieves public information about an OAuth application by its client ID. Used during the authorization flow to display application details to the user. */
   applicationInfo: Application;
+  /** Recently archived GitHub integrations. Returns integrations archived within the last 30 days. */
+  archivedIntegrations: Array<ArchivedIntegrationPayload>;
   /** [Internal] All archived teams of the workspace. */
   archivedTeams: Array<Team>;
   /**
@@ -20055,6 +20214,8 @@ export type ReleasePipeline = Node & {
   stages: ReleaseStageConnection;
   /** Teams associated with this pipeline. */
   teams: TeamConnection;
+  /** A flag that indicates whether the pipeline is in the trash bin. Trashed pipelines are archived and will be permanently deleted after a retention period. Null when the pipeline is not trashed. */
+  trashed?: Maybe<Scalars['Boolean']['output']>;
   /** The type of the pipeline, which determines how releases are created and managed. Continuous pipelines create a completed release per sync, while scheduled pipelines accumulate issues in a started release. */
   type: ReleasePipelineType;
   /**
@@ -21707,7 +21868,10 @@ export type Team = Node & {
   key: Scalars['String']['output'];
   /** Labels associated with the team. */
   labels: IssueLabelConnection;
-  /** The workflow state into which issues are moved when they are marked as a duplicate of another issue. Defaults to the first canceled state. */
+  /**
+   * [DEPRECATED] No longer in use. Duplicates are now system-managed via the native duplicate state.
+   * @deprecated Duplicates are now system-managed via the native duplicate state.
+   */
   markedAsDuplicateWorkflowState?: Maybe<WorkflowState>;
   /** Users who are members of this team. Supports filtering and pagination. */
   members: UserConnection;
@@ -21746,6 +21910,8 @@ export type Team = Node & {
   projects: ProjectConnection;
   /** [Internal] Whether this team is protected. */
   protected: Scalars['Boolean']['output'];
+  /** [Internal] For protected teams, the enclosing private team that forms the visibility boundary. Null for public and private teams. */
+  protectedBy?: Maybe<Team>;
   /** Release pipelines associated with the team. */
   releasePipelines: ReleasePipelineConnection;
   /** Whether an issue needs to have a priority set before leaving triage. */
@@ -22059,8 +22225,6 @@ export type TeamCreateInput = {
   issueSharingEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   /** The key of the team. If not given, the key will be generated based on the name of the team. */
   key?: InputMaybe<Scalars['String']['input']>;
-  /** The workflow state into which issues are moved when they are marked as a duplicate of another issue. */
-  markedAsDuplicateWorkflowStateId?: InputMaybe<Scalars['String']['input']>;
   /** The name of the team. */
   name: Scalars['String']['input'];
   /** The parent team ID. */
@@ -22412,8 +22576,6 @@ export type TeamUpdateInput = {
   joinByDefault?: InputMaybe<Scalars['Boolean']['input']>;
   /** The key of the team. */
   key?: InputMaybe<Scalars['String']['input']>;
-  /** The workflow state into which issues are moved when they are marked as a duplicate of another issue. */
-  markedAsDuplicateWorkflowStateId?: InputMaybe<Scalars['String']['input']>;
   /** The name of the team. */
   name?: InputMaybe<Scalars['String']['input']>;
   /** The parent team ID. */
@@ -22992,6 +23154,8 @@ export type User = Node & {
   gitHubUserId?: Maybe<Scalars['String']['output']>;
   /** Whether the user is a guest in the workspace and limited to accessing a subset of teams. */
   guest: Scalars['Boolean']['output'];
+  /** [Internal] Whether this user can access GitHub source code through Linear. True when the workspace has connected GitHub code-access repositories and the user has an active personal GitHub code-access token for the same GitHub host. Always false when queried for a user other than the authenticated viewer. */
+  hasGitHubCodeAccess: Scalars['Boolean']['output'];
   /** The unique identifier of the entity. */
   id: Scalars['ID']['output'];
   /** [INTERNAL] Identity provider the user is managed by. */
@@ -23254,6 +23418,8 @@ export enum UserFlagType {
   AgentExamplesDismissed = 'agentExamplesDismissed',
   AgentHomeHeadlineSeen = 'agentHomeHeadlineSeen',
   AgentHomePageNotice = 'agentHomePageNotice',
+  AgentSharedSkillsPromoDismissed = 'agentSharedSkillsPromoDismissed',
+  AgentSharedSkillsSplashAnimationSeen = 'agentSharedSkillsSplashAnimationSeen',
   All = 'all',
   AnalyticsWelcomeDismissed = 'analyticsWelcomeDismissed',
   CanPlaySnake = 'canPlaySnake',
@@ -23289,6 +23455,7 @@ export enum UserFlagType {
   ProjectUpdatesWelcomeDismissed = 'projectUpdatesWelcomeDismissed',
   ProjectWelcomeDismissed = 'projectWelcomeDismissed',
   PulseWelcomeDismissed = 'pulseWelcomeDismissed',
+  ReviewsPromptToConnectGithubDismissed = 'reviewsPromptToConnectGithubDismissed',
   RewindBannerDismissed = 'rewindBannerDismissed',
   SlackAgentPromoFromCreateNewIssueShown = 'slackAgentPromoFromCreateNewIssueShown',
   SlackBotWelcomeMessageShown = 'slackBotWelcomeMessageShown',
@@ -24017,11 +24184,11 @@ export type ViewPreferencesValues = {
   releasePipelinesViewOrdering?: Maybe<Scalars['String']['output']>;
   /** Whether to show the review avatar field. */
   reviewFieldAvatar?: Maybe<Scalars['Boolean']['output']>;
-  /** Whether to show the review checks field. */
+  /** No longer used. Previously controlled the review checks field. */
   reviewFieldChecks?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to show the review identifier field. */
   reviewFieldIdentifier?: Maybe<Scalars['Boolean']['output']>;
-  /** Whether to show the review preview links field. */
+  /** No longer used. Previously controlled the review preview links field. */
   reviewFieldPreviewLinks?: Maybe<Scalars['Boolean']['output']>;
   /** Whether to show the review repository field. */
   reviewFieldRepository?: Maybe<Scalars['Boolean']['output']>;
