@@ -193,5 +193,21 @@ export async function updateIssue(
   if (!result.issueUpdate.success || !result.issueUpdate.issue) {
     throw new Error("Failed to update issue");
   }
-  return result.issueUpdate.issue;
+  const issue = result.issueUpdate.issue;
+
+  // Linear's issueUpdate returns success:true even when it silently ignores an
+  // assigneeId it refuses to apply (e.g. the resolved user is not assignable on
+  // the issue's team). Without this guard the CLI reports success while the
+  // assignee never changed — a silent no-op. Verify the write landed and fail
+  // loudly instead. Only checks when a concrete assignee was requested; passing
+  // assigneeId:null (unassign) is exempt.
+  if (input.assigneeId != null && issue.assignee?.id !== input.assigneeId) {
+    throw new Error(
+      `Issue updated but the assignee was not applied (requested ${input.assigneeId}, ` +
+        `got ${issue.assignee?.id ?? "null"}). ` +
+        `The user is likely not assignable on this issue's team.`,
+    );
+  }
+
+  return issue;
 }
