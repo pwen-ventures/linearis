@@ -315,8 +315,8 @@ describe("issues create --due-date", () => {
       "not-a-date",
     ]);
 
-    expect(console.error).toHaveBeenCalledWith(
-      expect.stringContaining("Invalid due date format"),
+    expect(fdOutput(vi.mocked(fs.writeSync), 2)).toContain(
+      "Invalid due date format",
     );
   });
 });
@@ -457,10 +457,8 @@ describe("issues update --due-date", () => {
       "--clear-due-date",
     ]);
 
-    expect(console.error).toHaveBeenCalledWith(
-      expect.stringContaining(
-        "Cannot use --due-date and --clear-due-date together",
-      ),
+    expect(fdOutput(vi.mocked(fs.writeSync), 2)).toContain(
+      "Cannot use --due-date and --clear-due-date together",
     );
   });
 
@@ -476,9 +474,7 @@ describe("issues update --due-date", () => {
       "2025-13-01",
     ]);
 
-    expect(console.error).toHaveBeenCalledWith(
-      expect.stringContaining("Invalid due date"),
-    );
+    expect(fdOutput(vi.mocked(fs.writeSync), 2)).toContain("Invalid due date");
   });
 });
 
@@ -756,8 +752,8 @@ describe("issues create relations", () => {
       "--relates-to",
       "DAT-103",
     ]);
-    expect(console.error).toHaveBeenCalledWith(
-      expect.stringContaining("appears in multiple relation flags"),
+    expect(fdOutput(vi.mocked(fs.writeSync), 2)).toContain(
+      "appears in multiple relation flags",
     );
     expect(process.exit).toHaveBeenCalledWith(1);
   });
@@ -839,8 +835,8 @@ describe("issues update relations", () => {
       "--relates-to",
       "DAT-103",
     ]);
-    expect(console.error).toHaveBeenCalledWith(
-      expect.stringContaining("appears in multiple relation flags"),
+    expect(fdOutput(vi.mocked(fs.writeSync), 2)).toContain(
+      "appears in multiple relation flags",
     );
     expect(process.exit).toHaveBeenCalledWith(1);
   });
