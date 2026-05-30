@@ -251,6 +251,57 @@ describe("updateIssue", () => {
       updateIssue(client, "issue-id", { title: "Fail" }),
     ).rejects.toThrow("Failed to update issue");
   });
+
+  it("returns result when the requested assignee was applied", async () => {
+    const client = mockGqlClient({
+      issueUpdate: {
+        success: true,
+        issue: {
+          id: "issue-id",
+          identifier: "ENG-1",
+          title: "Assigned",
+          assignee: { id: "user-1", name: "Paul" },
+        },
+      },
+    });
+    const result = await updateIssue(client, "issue-id", {
+      assigneeId: "user-1",
+    });
+    expect(result.assignee?.id).toBe("user-1");
+  });
+
+  it("throws when issueUpdate reports success but silently drops the assignee", async () => {
+    const client = mockGqlClient({
+      issueUpdate: {
+        success: true,
+        issue: {
+          id: "issue-id",
+          identifier: "ENG-1",
+          title: "Not assigned",
+          assignee: null,
+        },
+      },
+    });
+    await expect(
+      updateIssue(client, "issue-id", { assigneeId: "user-1" }),
+    ).rejects.toThrow("assignee was not applied");
+  });
+
+  it("does not verify assignee when unassigning with assigneeId null", async () => {
+    const client = mockGqlClient({
+      issueUpdate: {
+        success: true,
+        issue: {
+          id: "issue-id",
+          identifier: "ENG-1",
+          title: "Unassigned",
+          assignee: null,
+        },
+      },
+    });
+    const result = await updateIssue(client, "issue-id", { assigneeId: null });
+    expect(result.assignee).toBeNull();
+  });
 });
 
 describe("getIssueWithAttachments", () => {
