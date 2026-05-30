@@ -854,8 +854,8 @@ describe("issues update relations", () => {
       "--remove-relation",
       "DAT-913",
     ]);
-    expect(console.error).toHaveBeenCalledWith(
-      expect.stringContaining("Cannot mix add and remove relation flags"),
+    expect(fdOutput(vi.mocked(fs.writeSync), 2)).toContain(
+      "Cannot mix add and remove relation flags",
     );
     expect(process.exit).toHaveBeenCalledWith(1);
   });

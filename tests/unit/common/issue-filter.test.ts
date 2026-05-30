@@ -73,67 +73,75 @@ describe("validateDateRange", () => {
 
 describe("validateFilterDependencies", () => {
   it("throws when --status used without --team", () => {
-    expect(() => validateFilterDependencies({ status: "In Progress" })).toThrow(
-      "--team",
-    );
+    expect(() =>
+      validateFilterDependencies({ status: "In Progress" }, { hasTeam: false }),
+    ).toThrow("--team");
   });
 
   it("allows --status with --team", () => {
     expect(() =>
-      validateFilterDependencies({ status: "In Progress", team: "ENG" }),
+      validateFilterDependencies({ status: "In Progress" }, { hasTeam: true }),
     ).not.toThrow();
   });
 
   it("allows --status UUID without --team", () => {
     expect(() =>
-      validateFilterDependencies({
-        status: "550e8400-e29b-41d4-a716-446655440000",
-      }),
+      validateFilterDependencies(
+        { status: "550e8400-e29b-41d4-a716-446655440000" },
+        { hasTeam: false },
+      ),
     ).not.toThrow();
   });
 
   it("throws when --cycle used without --team", () => {
-    expect(() => validateFilterDependencies({ cycle: "Sprint 1" })).toThrow(
-      "--team",
-    );
+    expect(() =>
+      validateFilterDependencies({ cycle: "Sprint 1" }, { hasTeam: false }),
+    ).toThrow("--team");
   });
 
   it("allows --cycle with --team", () => {
     expect(() =>
-      validateFilterDependencies({ cycle: "Sprint 1", team: "ENG" }),
+      validateFilterDependencies({ cycle: "Sprint 1" }, { hasTeam: true }),
     ).not.toThrow();
   });
 
   it("allows --cycle UUID without --team", () => {
     expect(() =>
-      validateFilterDependencies({
-        cycle: "550e8400-e29b-41d4-a716-446655440001",
-      }),
+      validateFilterDependencies(
+        { cycle: "550e8400-e29b-41d4-a716-446655440001" },
+        { hasTeam: false },
+      ),
     ).not.toThrow();
   });
 
   it("throws when --milestone used without --project", () => {
-    expect(() => validateFilterDependencies({ milestone: "v1.0" })).toThrow(
-      "--project",
-    );
+    expect(() =>
+      validateFilterDependencies({ milestone: "v1.0" }, { hasTeam: false }),
+    ).toThrow("--project");
   });
 
   it("allows --milestone with --project", () => {
     expect(() =>
-      validateFilterDependencies({ milestone: "v1.0", project: "MyProject" }),
+      validateFilterDependencies(
+        { milestone: "v1.0", project: "MyProject" },
+        { hasTeam: false },
+      ),
     ).not.toThrow();
   });
 
   it("allows --milestone UUID without --project", () => {
     expect(() =>
-      validateFilterDependencies({
-        milestone: "550e8400-e29b-41d4-a716-446655440002",
-      }),
+      validateFilterDependencies(
+        { milestone: "550e8400-e29b-41d4-a716-446655440002" },
+        { hasTeam: false },
+      ),
     ).not.toThrow();
   });
 
   it("does nothing with no dependency flags", () => {
-    expect(() => validateFilterDependencies({ team: "ENG" })).not.toThrow();
+    expect(() =>
+      validateFilterDependencies({}, { hasTeam: true }),
+    ).not.toThrow();
   });
 });
 

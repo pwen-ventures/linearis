@@ -1,5 +1,17 @@
+import * as fs from "node:fs";
 import { Command } from "commander";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fdOutput } from "../helpers/output-capture.js";
+
+// outputSuccess writes to fd 1 via fs.writeSync, not console.log — capture it.
+vi.mock("node:fs", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:fs")>();
+  const writeSync = vi.fn(
+    (_fd: number, buf: Buffer, _offset?: number, length?: number) =>
+      length ?? buf.length,
+  );
+  return { ...actual, default: { ...actual, writeSync }, writeSync };
+});
 
 // Mock all external dependencies before importing the module under test
 vi.mock("node:child_process", () => ({
@@ -166,11 +178,9 @@ describe("auth login", () => {
 });
 
 describe("auth logout", () => {
-  let stdoutSpy: ReturnType<typeof vi.spyOn>;
-
   beforeEach(() => {
     vi.clearAllMocks();
-    stdoutSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "log").mockImplementation(() => {});
     vi.spyOn(process, "exit").mockImplementation(() => undefined as never);
   });
 
@@ -183,7 +193,7 @@ describe("auth logout", () => {
     await program.parseAsync(["node", "test", "auth", "logout"]);
 
     expect(clearToken).toHaveBeenCalled();
-    const output = JSON.parse(stdoutSpy.mock.calls[0][0] as string);
+    const output = JSON.parse(fdOutput(vi.mocked(fs.writeSync), 1));
     expect(output).toEqual({ message: "Authentication token removed." });
   });
 
@@ -197,7 +207,7 @@ describe("auth logout", () => {
     await program.parseAsync(["node", "test", "auth", "logout"]);
 
     expect(clearToken).toHaveBeenCalled();
-    const output = JSON.parse(stdoutSpy.mock.calls[0][0] as string);
+    const output = JSON.parse(fdOutput(vi.mocked(fs.writeSync), 1));
     expect(output).toEqual({
       message: "Authentication token removed.",
       warning: "A token is still active via LINEAR_API_TOKEN env var.",

@@ -21,10 +21,14 @@ import { getStoredToken } from "../../../src/common/token-storage.js";
 
 describe("getApiToken", () => {
   const originalEnv = process.env.LINEAR_API_TOKEN;
+  // resolveApiToken also honours LINEARIS_PROFILE; isolate it so an ambient
+  // profile in the caller's environment can't leak into these unit tests.
+  const originalProfile = process.env.LINEARIS_PROFILE;
 
   beforeEach(() => {
     vi.clearAllMocks();
     delete process.env.LINEAR_API_TOKEN;
+    delete process.env.LINEARIS_PROFILE;
     vi.mocked(os.homedir).mockReturnValue("/home/testuser");
   });
 
@@ -33,6 +37,11 @@ describe("getApiToken", () => {
       process.env.LINEAR_API_TOKEN = originalEnv;
     } else {
       delete process.env.LINEAR_API_TOKEN;
+    }
+    if (originalProfile !== undefined) {
+      process.env.LINEARIS_PROFILE = originalProfile;
+    } else {
+      delete process.env.LINEARIS_PROFILE;
     }
   });
 
